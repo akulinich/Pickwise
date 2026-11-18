@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('keeps the matchup matrix scrollable without overlapping cells on a phone', async ({ page }) => {
+test('fits the icon-only matchup matrix without overlapping cells on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('./')
 
@@ -9,7 +9,7 @@ test('keeps the matchup matrix scrollable without overlapping cells on a phone',
     clientWidth: element.clientWidth,
     scrollWidth: element.scrollWidth,
   }))
-  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth)
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 2)
 
   const cells = page.locator('.input-matrix tbody tr').first().locator('td')
   const boxes = await cells.evaluateAll((elements) =>
@@ -20,7 +20,7 @@ test('keeps the matchup matrix scrollable without overlapping cells on a phone',
   )
   expect(boxes).toHaveLength(4)
   for (let index = 0; index < boxes.length - 1; index += 1) {
-    expect(boxes[index].width).toBeGreaterThan(120)
+    expect(boxes[index].width).toBeGreaterThan(45)
     expect(boxes[index + 1].left).toBeGreaterThanOrEqual(boxes[index].right - 1)
   }
 })

@@ -1195,6 +1195,68 @@ code {
     width: 100%;
   }
 
+  .matrix-card {
+    padding: 10px;
+  }
+
+  .input-matrix {
+    min-width: 100%;
+  }
+
+  .input-matrix th {
+    min-width: 0;
+    padding: 4px;
+  }
+
+  .input-matrix td {
+    padding: 4px;
+  }
+
+  .input-matrix .matrix-corner {
+    width: 62px;
+    font-size: 0;
+    text-align: center;
+  }
+
+  .input-matrix .matrix-corner::after {
+    content: "↓ / →";
+    font-size: 0.72rem;
+  }
+
+  .input-matrix th .class-picker {
+    min-width: 0;
+  }
+
+  .input-matrix th .class-picker select {
+    padding: 0;
+    color: transparent;
+    font-size: 0;
+  }
+
+  .input-matrix th .class-picker select option {
+    color: #111827;
+    font-size: 1rem;
+  }
+
+  .input-matrix th .class-icon {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .input-matrix .percent-input {
+    min-width: 0;
+  }
+
+  .input-matrix .percent-input input {
+    padding: 8px 1px;
+    font-size: 0.82rem;
+    text-align: center;
+  }
+
+  .input-matrix .percent-input > span {
+    display: none;
+  }
+
   .calculate-action {
     align-items: stretch;
     flex-direction: column;
