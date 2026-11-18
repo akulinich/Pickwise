@@ -498,7 +498,19 @@ select:hover {
 }
 
 .input-matrix td .percent-input {
+  border: 0;
+  border-radius: 0;
   background: transparent;
+}
+
+.input-matrix td:focus-within {
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.input-matrix td .percent-input input:focus-visible {
+  outline: 0;
 }
 
 .input-matrix .matrix-corner {

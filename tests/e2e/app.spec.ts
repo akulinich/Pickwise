@@ -30,6 +30,11 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   expect(colors[0]).toContain('69, 191, 131')
   expect(colors[1]).toContain('239, 100, 100')
   expect(colors[3]).toBe('rgb(14, 22, 36)')
+
+  const firstInput = page.getByLabel('Warrior win rate against Paladin')
+  await expect(firstInput.locator('..')).toHaveCSS('border-top-width', '0px')
+  await firstInput.focus()
+  await expect(cells.first()).not.toHaveCSS('box-shadow', 'none')
 })
 
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {
