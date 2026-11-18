@@ -15,7 +15,6 @@ export const HEARTHSTONE_CLASSES = [
 export type HearthstoneClass = (typeof HEARTHSTONE_CLASSES)[number]["id"];
 
 export interface DeckInput {
-  name: string;
   classId: HearthstoneClass;
 }
 
@@ -40,14 +39,8 @@ export function createDefaultInput(): SolverInput {
   const opponentClasses: HearthstoneClass[] = ["paladin", "shaman", "priest", "hunter"];
   return {
     eventName: "Conquest match",
-    myDecks: myClasses.map((classId) => ({
-      name: `${className(classId)} deck`,
-      classId,
-    })),
-    opponentDecks: opponentClasses.map((classId) => ({
-      name: `${className(classId)} deck`,
-      classId,
-    })),
+    myDecks: myClasses.map((classId) => ({ classId })),
+    opponentDecks: opponentClasses.map((classId) => ({ classId })),
     matrix: [
       [55, 42, 61, 50],
       [48, 63, 45, 57],
@@ -71,14 +64,6 @@ export function validateInput(input: SolverInput): string[] {
   const errors: string[] = [];
   if (input.myDecks.length !== 4 || input.opponentDecks.length !== 4) {
     errors.push("Each lineup must contain exactly four decks.");
-  }
-  for (const [side, decks] of [
-    ["Your", input.myDecks],
-    ["Opponent", input.opponentDecks],
-  ] as const) {
-    decks.forEach((deck, index) => {
-      if (!deck.name.trim()) errors.push(`${side} deck ${index + 1} needs a name.`);
-    });
   }
   if (input.matrix.length !== 4 || input.matrix.some((row) => row.length !== 4)) {
     errors.push("The matchup matrix must be 4 × 4.");

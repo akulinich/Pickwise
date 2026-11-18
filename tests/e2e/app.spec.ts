@@ -16,7 +16,7 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   await expect(page.getByText('04 · All 63 reachable states')).toBeVisible()
 
   const state = page.locator('details').filter({
-    has: page.getByText('V(Warrior deck, Paladin deck)', { exact: true }),
+    has: page.getByText('V(Warrior, Paladin)', { exact: true }),
   })
   await state.locator('summary').click()
   await expect(state.getByText('Your strategy', { exact: true })).toBeVisible()
@@ -29,7 +29,7 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   const download = await downloadPromise
   expect(download.suggestedFilename()).toBe('conquest-match-match-sheet.pdf')
 
-  await page.getByLabel('Warrior deck win rate against Priest deck').fill('60')
+  await page.getByLabel('Warrior win rate against Priest').fill('60')
   await expect(page.getByText(/Inputs changed\. These results are preserved/)).toBeVisible()
   await expect(page.getByRole('button', { name: 'Download PDF' })).toBeDisabled()
 })

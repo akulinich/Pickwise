@@ -1,10 +1,11 @@
-import { classIconUrl, type DeckInput } from "../domain/model";
+import { classIconUrl, className as hearthstoneClassName, type DeckInput } from "../domain/model";
 import { maskToIndices, type WeightedDeck } from "../solver/conquest";
 import { formatPercent } from "../utils/format";
 
 export function DeckIcon({ deck, className = "" }: { deck: DeckInput; className?: string }) {
+  const name = hearthstoneClassName(deck.classId);
   return (
-    <span className={`deck-icon ${className}`.trim()} title={deck.name} aria-label={deck.name}>
+    <span className={`deck-icon ${className}`.trim()} title={name} aria-label={name}>
       <img src={classIconUrl(deck.classId)} alt="" />
     </span>
   );
@@ -13,7 +14,7 @@ export function DeckIcon({ deck, className = "" }: { deck: DeckInput; className?
 export function DeckSet({ mask, decks }: { mask: number; decks: readonly DeckInput[] }) {
   const indices = maskToIndices(mask);
   if (indices.length === 0) return <span aria-label="Empty set">∅</span>;
-  const label = indices.map((index) => decks[index].name).join(", ");
+  const label = indices.map((index) => hearthstoneClassName(decks[index].classId)).join(", ");
   return (
     <span className="deck-icon-set" aria-label={label} title={label}>
       {indices.map((index) => (
@@ -37,7 +38,7 @@ export function StrategyMix({
   return (
     <span className="strategy-mix">
       {visible.map((item) => (
-        <span className="strategy-pick" key={item.deck} title={decks[item.deck].name}>
+        <span className="strategy-pick" key={item.deck} title={hearthstoneClassName(decks[item.deck].classId)}>
           <img src={classIconUrl(decks[item.deck].classId)} alt="" />
           <span>{formatPercent(item.probability, 1)}</span>
         </span>

@@ -1,5 +1,5 @@
 import { ClassPicker } from "./ClassPicker";
-import { classIconUrl, type DeckInput, type SolverInput } from "../domain/model";
+import { className, type SolverInput } from "../domain/model";
 import { formatProbabilityInput } from "../utils/format";
 
 interface SetupPanelProps {
@@ -8,10 +8,6 @@ interface SetupPanelProps {
   calculating: boolean;
   onChange(next: SolverInput): void;
   onCalculate(): void;
-}
-
-function updateDeck(decks: DeckInput[], index: number, patch: Partial<DeckInput>): DeckInput[] {
-  return decks.map((deck, deckIndex) => (deckIndex === index ? { ...deck, ...patch } : deck));
 }
 
 export function SetupPanel({
@@ -25,6 +21,23 @@ export function SetupPanel({
     const next = input.matrix.map((values) => [...values]);
     next[row][column] = raw === "" ? Number.NaN : Number(raw);
     onChange({ ...input, matrix: next });
+  };
+
+  const setMyClass = (index: number, classId: SolverInput["myDecks"][number]["classId"]) => {
+    const myDecks = input.myDecks.map((deck, deckIndex) =>
+      deckIndex === index ? { classId } : deck,
+    );
+    onChange({ ...input, myDecks });
+  };
+
+  const setOpponentClass = (
+    index: number,
+    classId: SolverInput["opponentDecks"][number]["classId"],
+  ) => {
+    const opponentDecks = input.opponentDecks.map((deck, deckIndex) =>
+      deckIndex === index ? { classId } : deck,
+    );
+    onChange({ ...input, opponentDecks });
   };
 
   return (
@@ -42,19 +55,6 @@ export function SetupPanel({
             onChange={(event) => onChange({ ...input, eventName: event.target.value })}
           />
         </label>
-      </div>
-
-      <div className="lineup-grid">
-        <LineupEditor
-          title="Your lineup"
-          decks={input.myDecks}
-          onChange={(myDecks) => onChange({ ...input, myDecks })}
-        />
-        <LineupEditor
-          title="Opponent lineup"
-          decks={input.opponentDecks}
-          onChange={(opponentDecks) => onChange({ ...input, opponentDecks })}
-        />
       </div>
 
       <div className="matrix-card">
@@ -77,11 +77,14 @@ export function SetupPanel({
           <table className="input-matrix">
             <thead>
               <tr>
-                <th aria-label="Your deck" />
+                <th className="matrix-corner">Your ↓ / Opponent →</th>
                 {input.opponentDecks.map((deck, index) => (
                   <th key={`opponent-${index}`} scope="col">
-                    <img className="matrix-class-icon" src={classIconUrl(deck.classId)} alt="" />
-                    <small>{deck.name || "Unnamed"}</small>
+                    <ClassPicker
+                      value={deck.classId}
+                      label={`Opponent deck ${index + 1} class`}
+                      onChange={(classId) => setOpponentClass(index, classId)}
+                    />
                   </th>
                 ))}
               </tr>
@@ -90,14 +93,17 @@ export function SetupPanel({
               {input.myDecks.map((deck, row) => (
                 <tr key={`mine-${row}`}>
                   <th scope="row">
-                    <img className="matrix-class-icon" src={classIconUrl(deck.classId)} alt="" />
-                    <small>{deck.name || "Unnamed"}</small>
+                    <ClassPicker
+                      value={deck.classId}
+                      label={`Your deck ${row + 1} class`}
+                      onChange={(classId) => setMyClass(row, classId)}
+                    />
                   </th>
                   {input.opponentDecks.map((opponentDeck, column) => (
                     <td key={`${row}-${column}`}>
                       <label className="percent-input">
                         <span className="sr-only">
-                          {deck.name} win rate against {opponentDeck.name}
+                          {className(deck.classId)} win rate against {className(opponentDeck.classId)}
                         </span>
                         <input
                           type="number"
@@ -161,40 +167,3 @@ export function SetupPanel({
   );
 }
 
-interface LineupEditorProps {
-  title: string;
-  decks: DeckInput[];
-  onChange(decks: DeckInput[]): void;
-}
-
-function LineupEditor({ title, decks, onChange }: LineupEditorProps) {
-  return (
-    <div className="lineup-card">
-      <div className="lineup-card-heading">
-        <h3>{title}</h3>
-      </div>
-      <div className="deck-list">
-        {decks.map((deck, index) => (
-          <div className="deck-row" key={index}>
-            <ClassPicker
-              value={deck.classId}
-              label={`${title} deck ${index + 1} class`}
-              onChange={(classId) => onChange(updateDeck(decks, index, { classId }))}
-            />
-            <label className="deck-name-field">
-              <span className="sr-only">{title} deck {index + 1} name</span>
-              <input
-                value={deck.name}
-                maxLength={48}
-                placeholder="Deck name"
-                onChange={(event) =>
-                  onChange(updateDeck(decks, index, { name: event.target.value }))
-                }
-              />
-            </label>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

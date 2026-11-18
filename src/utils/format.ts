@@ -1,4 +1,4 @@
-import type { DeckInput } from "../domain/model";
+import { className, type DeckInput } from "../domain/model";
 import { maskToIndices, type WeightedDeck } from "../solver/conquest";
 
 export function formatPercent(value: number, digits = 1): string {
@@ -16,7 +16,7 @@ export function formatProbabilityInput(value: number): string {
 export function stateLabel(mask: number, decks: readonly DeckInput[]): string {
   if (mask === 0) return "∅";
   return maskToIndices(mask)
-    .map((index) => decks[index]?.name || `Deck ${index + 1}`)
+    .map((index) => decks[index] ? className(decks[index].classId) : `Deck ${index + 1}`)
     .join(" + ");
 }
 
@@ -28,7 +28,7 @@ export function strategyLabel(
   const visible = strategy.filter((item) => item.probability + 1e-12 >= threshold);
   if (visible.length === 0) return "—";
   return visible
-    .map((item) => `${decks[item.deck]?.name ?? `Deck ${item.deck + 1}`} ${formatPercent(item.probability, 1)}`)
+    .map((item) => `${decks[item.deck] ? className(decks[item.deck].classId) : `Deck ${item.deck + 1}`} ${formatPercent(item.probability, 1)}`)
     .join(" · ");
 }
 
