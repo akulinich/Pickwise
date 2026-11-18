@@ -16,8 +16,8 @@ export function formatProbabilityInput(value: number): string {
 export function stateLabel(mask: number, decks: readonly DeckInput[]): string {
   if (mask === 0) return "∅";
   return maskToIndices(mask)
-    .map((index) => decks[index]?.alias || `#${index + 1}`)
-    .join("");
+    .map((index) => decks[index]?.name || `Deck ${index + 1}`)
+    .join(" + ");
 }
 
 export function strategyLabel(
@@ -28,7 +28,7 @@ export function strategyLabel(
   const visible = strategy.filter((item) => item.probability + 1e-12 >= threshold);
   if (visible.length === 0) return "—";
   return visible
-    .map((item) => `${decks[item.deck]?.alias ?? item.deck + 1} ${formatPercent(item.probability, 1)}`)
+    .map((item) => `${decks[item.deck]?.name ?? `Deck ${item.deck + 1}`} ${formatPercent(item.probability, 1)}`)
     .join(" · ");
 }
 

@@ -16,7 +16,6 @@ export type HearthstoneClass = (typeof HEARTHSTONE_CLASSES)[number]["id"];
 
 export interface DeckInput {
   name: string;
-  alias: string;
   classId: HearthstoneClass;
 }
 
@@ -41,14 +40,12 @@ export function createDefaultInput(): SolverInput {
   const opponentClasses: HearthstoneClass[] = ["paladin", "shaman", "priest", "hunter"];
   return {
     eventName: "Conquest match",
-    myDecks: myClasses.map((classId, index) => ({
+    myDecks: myClasses.map((classId) => ({
       name: `${className(classId)} deck`,
-      alias: String.fromCharCode(65 + index),
       classId,
     })),
-    opponentDecks: opponentClasses.map((classId, index) => ({
+    opponentDecks: opponentClasses.map((classId) => ({
       name: `${className(classId)} deck`,
-      alias: ["X", "Y", "Z", "W"][index],
       classId,
     })),
     matrix: [
@@ -81,12 +78,7 @@ export function validateInput(input: SolverInput): string[] {
   ] as const) {
     decks.forEach((deck, index) => {
       if (!deck.name.trim()) errors.push(`${side} deck ${index + 1} needs a name.`);
-      if (!deck.alias.trim()) errors.push(`${side} deck ${index + 1} needs an alias.`);
     });
-    const aliases = decks.map((deck) => deck.alias.trim().toLocaleLowerCase());
-    if (new Set(aliases).size !== aliases.length) {
-      errors.push(`${side} deck aliases must be unique.`);
-    }
   }
   if (input.matrix.length !== 4 || input.matrix.some((row) => row.length !== 4)) {
     errors.push("The matchup matrix must be 4 × 4.");

@@ -6,6 +6,7 @@ import {
 } from "../solver/conquest";
 import { formatPercent, heatColor } from "../utils/format";
 import { DecisionTable } from "./DecisionTable";
+import { DeckIcon } from "./DeckIcons";
 
 interface ResultsPanelProps {
   input: SolverInput;
@@ -111,14 +112,14 @@ export function ResultsPanel({
               <tr>
                 <th scope="col">You ban ↓ / They ban →</th>
                 {input.myDecks.map((deck, index) => (
-                  <th scope="col" key={index}>{deck.alias}</th>
+                  <th scope="col" key={index}><DeckIcon deck={deck} className="table-deck-icon" /></th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {result.payoffMatrix.map((row, ourBan) => (
                 <tr key={ourBan}>
-                  <th scope="row">{input.opponentDecks[ourBan].alias}</th>
+                  <th scope="row"><DeckIcon deck={input.opponentDecks[ourBan]} className="table-deck-icon" /></th>
                   {row.map((value, opponentBan) => (
                     <td key={opponentBan} style={{ background: heatColor(value) }}>
                       {formatPercent(value, 1)}
@@ -145,7 +146,7 @@ export function ResultsPanel({
                 onChange={(event) => onSelectedViewOurBan(Number(event.target.value))}
               >
                 {input.opponentDecks.map((deck, index) => (
-                  <option key={index} value={index}>{deck.alias} · {deck.name}</option>
+                  <option key={index} value={index}>{deck.name}</option>
                 ))}
               </select>
             </label>
@@ -156,7 +157,7 @@ export function ResultsPanel({
                 onChange={(event) => onSelectedOpponentBan(Number(event.target.value))}
               >
                 {input.myDecks.map((deck, index) => (
-                  <option key={index} value={index}>{deck.alias} · {deck.name}</option>
+                  <option key={index} value={index}>{deck.name}</option>
                 ))}
               </select>
             </label>

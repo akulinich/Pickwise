@@ -2,7 +2,7 @@ import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { classIconUrl, type DeckInput, type SolverInput } from "../domain/model";
 import { subsetsForMask, type BanResult, type ConquestSolution } from "../solver/conquest";
-import { formatPercent, stateLabel } from "../utils/format";
+import { formatPercent } from "../utils/format";
 
 const PAGE_WIDTH = 841.89;
 const PAGE_HEIGHT = 595.28;
@@ -94,7 +94,7 @@ function drawDeckSymbol(
   if (image) {
     page.drawImage(image, { x: x - size / 2, y: y - size / 2, width: size, height: size });
   } else {
-    centeredText(page, deck.alias, x, y - size * 0.23, size, fonts.bold, size * 0.6);
+    centeredText(page, deck.name, x, y - size * 0.23, size * 2, fonts.bold, size * 0.35);
   }
 }
 
@@ -227,8 +227,9 @@ function drawDecisionCard(
         (item) => item.probability > 1e-9 && item.probability + 1e-12 >= input.displayThreshold / 100,
       );
       picks.slice(0, 3).forEach((item, pickIndex) => {
-        const label = `${input.myDecks[item.deck].alias} ${formatPercent(item.probability, 0)}`;
-        centeredText(page, label, left + cellWidth / 2, bottom + 13 - pickIndex * 6.5, cellWidth - 3, fonts.regular, 5.7, MUTED);
+        const pickY = bottom + 13 - pickIndex * 6.5;
+        drawDeckSymbol(page, input.myDecks[item.deck], images, left + cellWidth / 2 - 9, pickY + 2, 6, fonts);
+        drawText(page, formatPercent(item.probability, 0), left + cellWidth / 2 - 4, pickY, 22, fonts.regular, 5.7, MUTED);
       });
     });
   });

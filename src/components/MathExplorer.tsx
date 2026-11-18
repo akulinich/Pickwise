@@ -39,7 +39,7 @@ function FormulaCell({
   const value = state.qMatrix[row][column];
   return (
     <div className="formula-cell">
-      <strong>Q[{input.myDecks[myDeck].alias}, {input.opponentDecks[opponentDeck].alias}]</strong>
+      <strong>Q[{input.myDecks[myDeck].name}, {input.opponentDecks[opponentDeck].name}]</strong>
       <code>
         {formatPercent(probability, 1)} × V({stateLabel(winMask, input.myDecks)},{" "}
         {stateLabel(state.opponentMask, input.opponentDecks)}) +{" "}
@@ -137,7 +137,7 @@ export function MathExplorer({
                 row.map((value, columnIndex) => (
                   <div key={`${rowIndex}-${columnIndex}`}>
                     <span>
-                      Ban {input.opponentDecks[rowIndex].alias} / lose {input.myDecks[columnIndex].alias}
+                      Ban {input.opponentDecks[rowIndex].name} / lose {input.myDecks[columnIndex].name}
                     </span>
                     <strong>{formatPercent(value, 3)}</strong>
                   </div>
@@ -161,7 +161,7 @@ export function MathExplorer({
                 <span>You ban</span>
                 <select value={ourBan} onChange={(event) => setOurBan(Number(event.target.value))}>
                   {input.opponentDecks.map((deck, index) => (
-                    <option value={index} key={index}>{deck.alias} · {deck.name}</option>
+                    <option value={index} key={index}>{deck.name}</option>
                   ))}
                 </select>
               </label>
@@ -169,7 +169,7 @@ export function MathExplorer({
                 <span>They ban</span>
                 <select value={opponentBan} onChange={(event) => setOpponentBan(Number(event.target.value))}>
                   {input.myDecks.map((deck, index) => (
-                    <option value={index} key={index}>{deck.alias} · {deck.name}</option>
+                    <option value={index} key={index}>{deck.name}</option>
                   ))}
                 </select>
               </label>

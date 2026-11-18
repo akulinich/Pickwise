@@ -16,7 +16,7 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   await expect(page.getByText('04 · All 63 reachable states')).toBeVisible()
 
   const state = page.locator('details').filter({
-    has: page.getByText('V(A, X)', { exact: true }),
+    has: page.getByText('V(Warrior deck, Paladin deck)', { exact: true }),
   })
   await state.locator('summary').click()
   await expect(state.getByText('Your strategy', { exact: true })).toBeVisible()

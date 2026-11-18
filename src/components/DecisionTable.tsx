@@ -1,7 +1,8 @@
 import type { SolverInput } from "../domain/model";
 import type { ConquestSolution } from "../solver/conquest";
-import { stateLabel, strategyLabel, formatPercent, heatColor } from "../utils/format";
+import { formatPercent, heatColor } from "../utils/format";
 import { subsetsForMask } from "../solver/conquest";
+import { DeckSet, StrategyMix } from "./DeckIcons";
 
 interface DecisionTableProps {
   solution: ConquestSolution;
@@ -25,7 +26,7 @@ export function DecisionTable({ solution, input, compact = true }: DecisionTable
             </th>
             {opponentStates.map((mask) => (
               <th scope="col" key={mask}>
-                {stateLabel(mask, input.opponentDecks)}
+                <DeckSet mask={mask} decks={input.opponentDecks} />
               </th>
             ))}
           </tr>
@@ -33,13 +34,13 @@ export function DecisionTable({ solution, input, compact = true }: DecisionTable
         <tbody>
           {myStates.map((myMask) => (
             <tr key={myMask}>
-              <th scope="row">{stateLabel(myMask, input.myDecks)}</th>
+              <th scope="row"><DeckSet mask={myMask} decks={input.myDecks} /></th>
               {opponentStates.map((opponentMask) => {
                 const state = solution.getState(myMask, opponentMask);
                 return (
                   <td key={`${myMask}:${opponentMask}`} style={{ background: heatColor(state.value) }}>
                     <strong>{formatPercent(state.value, 1)}</strong>
-                    <span>{strategyLabel(state.myStrategy, input.myDecks, threshold)}</span>
+                    <StrategyMix strategy={state.myStrategy} decks={input.myDecks} threshold={threshold} />
                   </td>
                 );
               })}

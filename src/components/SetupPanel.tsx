@@ -1,5 +1,5 @@
 import { ClassPicker } from "./ClassPicker";
-import type { DeckInput, SolverInput } from "../domain/model";
+import { classIconUrl, type DeckInput, type SolverInput } from "../domain/model";
 import { formatProbabilityInput } from "../utils/format";
 
 interface SetupPanelProps {
@@ -47,13 +47,11 @@ export function SetupPanel({
       <div className="lineup-grid">
         <LineupEditor
           title="Your lineup"
-          aliases="A–D"
           decks={input.myDecks}
           onChange={(myDecks) => onChange({ ...input, myDecks })}
         />
         <LineupEditor
           title="Opponent lineup"
-          aliases="X–W"
           decks={input.opponentDecks}
           onChange={(opponentDecks) => onChange({ ...input, opponentDecks })}
         />
@@ -82,7 +80,7 @@ export function SetupPanel({
                 <th aria-label="Your deck" />
                 {input.opponentDecks.map((deck, index) => (
                   <th key={`opponent-${index}`} scope="col">
-                    <span className="matrix-deck-label">{deck.alias || `#${index + 1}`}</span>
+                    <img className="matrix-class-icon" src={classIconUrl(deck.classId)} alt="" />
                     <small>{deck.name || "Unnamed"}</small>
                   </th>
                 ))}
@@ -92,7 +90,7 @@ export function SetupPanel({
               {input.myDecks.map((deck, row) => (
                 <tr key={`mine-${row}`}>
                   <th scope="row">
-                    <span className="matrix-deck-label">{deck.alias || `#${row + 1}`}</span>
+                    <img className="matrix-class-icon" src={classIconUrl(deck.classId)} alt="" />
                     <small>{deck.name || "Unnamed"}</small>
                   </th>
                   {input.opponentDecks.map((opponentDeck, column) => (
@@ -165,17 +163,15 @@ export function SetupPanel({
 
 interface LineupEditorProps {
   title: string;
-  aliases: string;
   decks: DeckInput[];
   onChange(decks: DeckInput[]): void;
 }
 
-function LineupEditor({ title, aliases, decks, onChange }: LineupEditorProps) {
+function LineupEditor({ title, decks, onChange }: LineupEditorProps) {
   return (
     <div className="lineup-card">
       <div className="lineup-card-heading">
         <h3>{title}</h3>
-        <span>{aliases}</span>
       </div>
       <div className="deck-list">
         {decks.map((deck, index) => (
@@ -193,17 +189,6 @@ function LineupEditor({ title, aliases, decks, onChange }: LineupEditorProps) {
                 placeholder="Deck name"
                 onChange={(event) =>
                   onChange(updateDeck(decks, index, { name: event.target.value }))
-                }
-              />
-            </label>
-            <label className="alias-field">
-              <span className="sr-only">{title} deck {index + 1} alias</span>
-              <input
-                value={deck.alias}
-                maxLength={3}
-                aria-label={`${title} deck ${index + 1} alias`}
-                onChange={(event) =>
-                  onChange(updateDeck(decks, index, { alias: event.target.value.toUpperCase() }))
                 }
               />
             </label>
