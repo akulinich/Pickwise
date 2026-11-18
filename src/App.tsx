@@ -147,9 +147,7 @@ export default function App() {
 
       <footer>
         <span>Pickwise runs entirely in your browser.</span>
-        <span>
-          Hearthstone class icons from HearthSim HSTracker · Hearthstone © Blizzard Entertainment
-        </span>
+        <span>Not affiliated with Blizzard Entertainment.</span>
       </footer>
 
       {showMath && result && solvedInput && (
