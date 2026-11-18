@@ -35,7 +35,7 @@ export default function App() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfError, setPdfError] = useState("");
   const [savedMatches, setSavedMatches] = useState(() => listSavedMatches());
-  const [selectedSavedMatchId, setSelectedSavedMatchId] = useState("");
+  const [activeSavedMatchId, setActiveSavedMatchId] = useState("");
   const [storageMessage, setStorageMessage] = useState("");
   const [storageMessageIsError, setStorageMessageIsError] = useState(false);
   const validationErrors = useMemo(() => validateInput(input), [input]);
@@ -63,6 +63,7 @@ export default function App() {
     (next: SolverInput) => {
       setInput(next);
       if (result) setStale(true);
+      setStorageMessage("");
     },
     [result],
   );
@@ -82,8 +83,11 @@ export default function App() {
         showSolution(snapshot, nextResult);
         try {
           const saved = saveMatch(snapshot);
+          if (activeSavedMatchId && activeSavedMatchId !== saved.id) {
+            deleteMatch(activeSavedMatchId);
+          }
           setSavedMatches(listSavedMatches());
-          setSelectedSavedMatchId(saved.id);
+          setActiveSavedMatchId(saved.id);
           setStorageMessage(`Saved locally as “${saved.name}”.`);
           setStorageMessageIsError(false);
         } catch (error) {
@@ -101,12 +105,11 @@ export default function App() {
     }, 0);
   };
 
-  const handleLoadSavedMatch = () => {
-    if (!selectedSavedMatchId) return;
-    const saved = loadMatch(selectedSavedMatchId);
+  const handleLoadSavedMatch = (id: string) => {
+    const saved = loadMatch(id);
     if (!saved) {
       setSavedMatches(listSavedMatches());
-      setSelectedSavedMatchId("");
+      if (activeSavedMatchId === id) setActiveSavedMatchId("");
       setStorageMessage("That saved match is no longer available.");
       setStorageMessageIsError(true);
       return;
@@ -118,6 +121,7 @@ export default function App() {
       try {
         const snapshot = cloneInput(saved.input);
         showSolution(snapshot, solveBans(probabilityMatrix(snapshot)));
+        setActiveSavedMatchId(saved.id);
         setStorageMessage(`Loaded “${saved.name}”.`);
         setStorageMessageIsError(false);
         scrollToResults();
@@ -129,14 +133,13 @@ export default function App() {
     }, 0);
   };
 
-  const handleDeleteSavedMatch = () => {
-    if (!selectedSavedMatchId) return;
-    const saved = savedMatches.find((match) => match.id === selectedSavedMatchId);
+  const handleDeleteSavedMatch = (id: string) => {
+    const saved = savedMatches.find((match) => match.id === id);
     if (!saved || !window.confirm(`Delete the saved calculation “${saved.name}”?`)) return;
     try {
       deleteMatch(saved.id);
       setSavedMatches(listSavedMatches());
-      setSelectedSavedMatchId("");
+      if (activeSavedMatchId === saved.id) setActiveSavedMatchId("");
       setStorageMessage(`Deleted “${saved.name}”.`);
       setStorageMessageIsError(false);
     } catch (error) {
@@ -145,6 +148,26 @@ export default function App() {
       );
       setStorageMessageIsError(true);
     }
+  };
+
+  const handleNewMatch = () => {
+    const usedNames = new Set(savedMatches.map((match) => match.name.toLocaleLowerCase("en-US")));
+    let name = "New match";
+    let suffix = 2;
+    while (usedNames.has(name.toLocaleLowerCase("en-US"))) {
+      name = `New match ${suffix}`;
+      suffix += 1;
+    }
+    setInput({ ...createDefaultInput(), eventName: name });
+    setSolvedInput(null);
+    setResult(null);
+    setStale(false);
+    setShowMath(false);
+    setCalculationError("");
+    setPdfError("");
+    setStorageMessage("");
+    setStorageMessageIsError(false);
+    setActiveSavedMatchId("");
   };
 
   const handleDownloadPdf = async () => {
@@ -194,14 +217,14 @@ export default function App() {
           errors={calculationError ? [calculationError] : validationErrors}
           calculating={calculating}
           savedMatches={savedMatches}
-          selectedSavedMatchId={selectedSavedMatchId}
+          activeSavedMatchId={activeSavedMatchId}
           storageMessage={storageMessage}
           storageMessageIsError={storageMessageIsError}
           onChange={handleInputChange}
           onCalculate={handleCalculate}
-          onSelectedSavedMatch={setSelectedSavedMatchId}
           onLoadSavedMatch={handleLoadSavedMatch}
           onDeleteSavedMatch={handleDeleteSavedMatch}
+          onNewMatch={handleNewMatch}
         />
 
         {result && solvedInput && (

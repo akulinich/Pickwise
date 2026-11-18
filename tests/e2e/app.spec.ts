@@ -28,25 +28,36 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {
   await page.goto('./')
 
-  await page.getByLabel('Sheet title').fill('Qualifier vs Alex')
+  await page.getByLabel('Match name').fill('Qualifier vs Alex')
   await page.getByLabel('Warrior win rate against Paladin').fill('67')
   await page.getByRole('button', { name: 'Calculate strategy' }).click()
   await expect(page.getByText('Saved locally as “Qualifier vs Alex”.')).toBeVisible()
 
   await page.reload()
-  const savedCalculations = page.getByRole('combobox', { name: 'Saved calculations' })
-  await savedCalculations.selectOption({ label: 'Qualifier vs Alex' })
-  await page.getByRole('button', { name: 'Load', exact: true }).click()
+  await page.getByRole('button', { name: 'Open saved matches' }).click()
+  await page.getByRole('menuitem', { name: 'Qualifier vs Alex' }).click()
 
-  await expect(page.getByLabel('Sheet title')).toHaveValue('Qualifier vs Alex')
+  await expect(page.getByLabel('Match name')).toHaveValue('Qualifier vs Alex')
   await expect(page.getByLabel('Warrior win rate against Paladin')).toHaveValue('67')
   await expect(page.getByRole('heading', { name: 'Match plan' })).toBeVisible()
   await expect(page.getByText('Loaded “Qualifier vs Alex”.')).toBeVisible()
 
+  await page.getByLabel('Match name').fill('Qualifier final')
+  await page.getByRole('button', { name: 'Calculate strategy' }).click()
+  await expect(page.getByText('Saved locally as “Qualifier final”.')).toBeVisible()
+  await page.getByRole('button', { name: 'Open saved matches' }).click()
+  await expect(page.getByRole('menuitem', { name: 'Qualifier final' })).toBeVisible()
+  await expect(page.getByRole('menuitem', { name: 'Qualifier vs Alex' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Open saved matches' }).click()
+
+  await page.getByRole('button', { name: 'New match' }).click()
+  await expect(page.getByLabel('Match name')).toHaveValue('New match')
+  await expect(page.getByRole('heading', { name: 'Match plan', exact: true })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Open saved matches' }).click()
   page.once('dialog', (dialog) => dialog.accept())
-  await page.getByRole('button', { name: 'Delete', exact: true }).click()
-  await expect(savedCalculations).toHaveValue('')
-  await expect(savedCalculations.locator('option')).toHaveText('No saved matches yet')
+  await page.getByRole('button', { name: 'Delete Qualifier final' }).click()
+  await expect(page.getByText('No saved matches yet')).toBeVisible()
 })
 
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {

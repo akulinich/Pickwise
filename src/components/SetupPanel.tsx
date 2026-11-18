@@ -1,4 +1,5 @@
 import { ClassPicker } from "./ClassPicker";
+import { MatchPicker } from "./MatchPicker";
 import { className, type SolverInput } from "../domain/model";
 import type { SavedMatch } from "../storage/savedMatches";
 import { formatProbabilityInput } from "../utils/format";
@@ -8,14 +9,14 @@ interface SetupPanelProps {
   errors: string[];
   calculating: boolean;
   savedMatches: SavedMatch[];
-  selectedSavedMatchId: string;
+  activeSavedMatchId: string;
   storageMessage: string;
   storageMessageIsError: boolean;
   onChange(next: SolverInput): void;
   onCalculate(): void;
-  onSelectedSavedMatch(id: string): void;
-  onLoadSavedMatch(): void;
-  onDeleteSavedMatch(): void;
+  onLoadSavedMatch(id: string): void;
+  onDeleteSavedMatch(id: string): void;
+  onNewMatch(): void;
 }
 
 export function SetupPanel({
@@ -23,14 +24,14 @@ export function SetupPanel({
   errors,
   calculating,
   savedMatches,
-  selectedSavedMatchId,
+  activeSavedMatchId,
   storageMessage,
   storageMessageIsError,
   onChange,
   onCalculate,
-  onSelectedSavedMatch,
   onLoadSavedMatch,
   onDeleteSavedMatch,
+  onNewMatch,
 }: SetupPanelProps) {
   const setMatrixValue = (row: number, column: number, raw: string) => {
     const next = input.matrix.map((values) => [...values]);
@@ -62,65 +63,38 @@ export function SetupPanel({
           <p className="eyebrow">Match setup</p>
           <h2 id="setup-heading">Build the field</h2>
         </div>
-        <label className="event-field">
-          <span>Sheet title</span>
-          <input
-            value={input.eventName}
-            maxLength={64}
-            onChange={(event) => onChange({ ...input, eventName: event.target.value })}
-          />
-        </label>
-      </div>
-
-      <div className="saved-matches-bar" aria-label="Saved calculations">
-        <label className="saved-match-field">
-          <span>Saved calculations</span>
-          <select
-            aria-label="Saved calculations"
-            value={selectedSavedMatchId}
-            disabled={savedMatches.length === 0}
-            onChange={(event) => onSelectedSavedMatch(event.target.value)}
-          >
-            {savedMatches.length === 0 ? (
-              <option value="">No saved matches yet</option>
-            ) : (
-              <>
-                <option value="">Choose a match</option>
-                {savedMatches.map((match) => (
-                  <option key={match.id} value={match.id}>
-                    {match.name}
-                  </option>
-                ))}
-              </>
-            )}
-          </select>
-        </label>
-        <div className="saved-match-actions">
-          <button
-            className="secondary-button"
-            type="button"
-            disabled={!selectedSavedMatchId || calculating}
-            onClick={onLoadSavedMatch}
-          >
-            Load
-          </button>
-          <button
-            className="text-button danger-button"
-            type="button"
-            disabled={!selectedSavedMatchId || calculating}
-            onClick={onDeleteSavedMatch}
-          >
-            Delete
-          </button>
+        <div className="match-controls">
+          <div className="match-control-row">
+            <MatchPicker
+              name={input.eventName}
+              savedMatches={savedMatches}
+              activeSavedMatchId={activeSavedMatchId}
+              onNameChange={(eventName) => onChange({ ...input, eventName })}
+              onLoad={onLoadSavedMatch}
+              onDelete={onDeleteSavedMatch}
+            />
+            <button
+              className="secondary-button new-match-button"
+              type="button"
+              disabled={calculating}
+              onClick={onNewMatch}
+            >
+              New match
+            </button>
+          </div>
+          {storageMessage && (
+            <p
+              className={
+                storageMessageIsError
+                  ? "match-storage-message error"
+                  : "match-storage-message"
+              }
+              role={storageMessageIsError ? "alert" : "status"}
+            >
+              {storageMessage}
+            </p>
+          )}
         </div>
-        {storageMessage && (
-          <p
-            className={storageMessageIsError ? "storage-message error" : "storage-message"}
-            role={storageMessageIsError ? "alert" : "status"}
-          >
-            {storageMessage}
-          </p>
-        )}
       </div>
 
       <div className="matrix-card">
