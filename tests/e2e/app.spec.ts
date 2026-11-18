@@ -37,6 +37,9 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
 
   await page.getByRole('button', { name: 'Show math' }).click()
   await expect(page.getByRole('dialog', { name: 'How Pickwise got this answer' })).toBeVisible()
+  await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/16\s*ban pairs/)
+  await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/63\s*reachable states per post-ban game/)
+  await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/0\s*data uploads/)
   await expect(page.getByText('Sixteen complete Conquest games become one 4 × 4 game')).toBeVisible()
   await expect(page.getByText('04 · All 63 reachable states')).toBeVisible()
 

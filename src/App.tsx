@@ -109,11 +109,6 @@ export default function App() {
               Calculated locally in your browser.
             </p>
           </div>
-          <div className="hero-metric" aria-label="Solver characteristics">
-            <div><strong>16</strong><span>ban pairs</span></div>
-            <div><strong>63</strong><span>states per game</span></div>
-            <div><strong>0</strong><span>data uploads</span></div>
-          </div>
         </section>
 
         <SetupPanel

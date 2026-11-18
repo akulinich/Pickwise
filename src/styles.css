@@ -145,9 +145,7 @@ footer {
 
 .hero {
   min-height: 310px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 56px;
+  display: flex;
   align-items: center;
   padding: 70px 0 58px;
 }
@@ -180,36 +178,6 @@ footer {
   color: var(--muted);
   font-size: 1.02rem;
   line-height: 1.65;
-}
-
-.hero-metric {
-  display: grid;
-  min-width: 160px;
-  border-left: 1px solid var(--line);
-}
-
-.hero-metric div {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 10px;
-  align-items: baseline;
-  padding: 14px 0 14px 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.hero-metric div:last-child {
-  border-bottom: 0;
-}
-
-.hero-metric strong {
-  color: var(--text);
-  font-size: 1.55rem;
-}
-
-.hero-metric span {
-  color: var(--muted);
-  font-size: 0.72rem;
-  white-space: nowrap;
 }
 
 .setup-shell,
@@ -882,6 +850,37 @@ footer {
   font-size: 1.25rem;
 }
 
+.math-scope {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.math-scope div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 12px 14px;
+  border-right: 1px solid var(--line);
+}
+
+.math-scope div:last-child {
+  border-right: 0;
+}
+
+.math-scope strong {
+  color: var(--accent-strong);
+  font-size: 1.15rem;
+}
+
+.math-scope span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
 .notation-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1126,24 +1125,6 @@ code {
 }
 
 @media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-
-  .hero-metric {
-    grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--line);
-    border-left: 0;
-  }
-
-  .hero-metric div {
-    grid-template-columns: 1fr;
-    padding: 14px;
-    border-right: 1px solid var(--line);
-    border-bottom: 0;
-  }
-
   .strategy-grid {
     grid-template-columns: 1fr;
   }

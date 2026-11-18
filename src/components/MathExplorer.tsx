@@ -117,6 +117,11 @@ export function MathExplorer({
           <article id="notation" className="math-section">
             <p className="eyebrow">01 · Notation</p>
             <h3>One value for every actual set of decks</h3>
+            <div className="math-scope" aria-label="Calculation scope">
+              <div><strong>16</strong><span>ban pairs</span></div>
+              <div><strong>63</strong><span>reachable states per post-ban game</span></div>
+              <div><strong>0</strong><span>data uploads</span></div>
+            </div>
             <div className="notation-grid">
               <div><strong>P[i,j]</strong><span>single-game win probability</span></div>
               <div><strong>S / T</strong><span>decks still needing a win</span></div>
