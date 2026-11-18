@@ -494,6 +494,11 @@ select:hover {
 .input-matrix td {
   padding: 7px;
   background: #0e1624;
+  transition: background-color 120ms ease;
+}
+
+.input-matrix td .percent-input {
+  background: transparent;
 }
 
 .input-matrix .matrix-corner {

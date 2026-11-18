@@ -2,7 +2,7 @@ import { ClassPicker } from "./ClassPicker";
 import { MatchPicker } from "./MatchPicker";
 import { className, type SolverInput } from "../domain/model";
 import type { SavedMatch } from "../storage/savedMatches";
-import { formatProbabilityInput } from "../utils/format";
+import { formatProbabilityInput, matchupInputColor } from "../utils/format";
 
 interface SetupPanelProps {
   input: SolverInput;
@@ -140,7 +140,10 @@ export function SetupPanel({
                     />
                   </th>
                   {input.opponentDecks.map((opponentDeck, column) => (
-                    <td key={`${row}-${column}`}>
+                    <td
+                      key={`${row}-${column}`}
+                      style={{ background: matchupInputColor(input.matrix[row][column]) }}
+                    >
                       <label className="percent-input">
                         <span className="sr-only">
                           {className(deck.classId)} win rate against {className(opponentDeck.classId)}

@@ -37,3 +37,12 @@ export function heatColor(value: number): string {
   if (value >= 0.5) return `rgba(69, 191, 131, ${0.08 + distance * 0.25})`;
   return `rgba(239, 100, 100, ${0.08 + distance * 0.25})`;
 }
+
+export function matchupInputColor(percent: number): string {
+  if (!Number.isFinite(percent) || Math.abs(percent - 50) < 1e-12) return "#0e1624";
+  const distance = Math.min(1, Math.abs(percent - 50) / 50);
+  const alpha = 0.08 + distance * 0.26;
+  return percent > 50
+    ? `rgba(69, 191, 131, ${alpha})`
+    : `rgba(239, 100, 100, ${alpha})`;
+}

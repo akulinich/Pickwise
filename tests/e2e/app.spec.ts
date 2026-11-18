@@ -23,6 +23,13 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
     expect(boxes[index].width).toBeGreaterThan(45)
     expect(boxes[index + 1].left).toBeGreaterThanOrEqual(boxes[index].right - 1)
   }
+
+  const colors = await cells.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).backgroundColor),
+  )
+  expect(colors[0]).toContain('69, 191, 131')
+  expect(colors[1]).toContain('239, 100, 100')
+  expect(colors[3]).toBe('rgb(14, 22, 36)')
 })
 
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {
