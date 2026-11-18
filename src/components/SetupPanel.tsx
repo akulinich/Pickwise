@@ -170,22 +170,6 @@ export function SetupPanel({
       </div>
 
       <div className="calculate-row">
-        <label className="threshold-field">
-          <span>Hide picks below</span>
-          <span className="percent-input compact">
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="0.1"
-              value={input.displayThreshold}
-              onChange={(event) =>
-                onChange({ ...input, displayThreshold: Number(event.target.value) })
-              }
-            />
-            <span>%</span>
-          </span>
-        </label>
         <div className="calculate-action">
           {errors.length > 0 && (
             <div className="validation-summary" role="alert">

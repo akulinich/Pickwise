@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { className, type SolverInput } from "../domain/model";
+import {
+  MIN_VISIBLE_PICK_PROBABILITY,
+  className,
+  type SolverInput,
+} from "../domain/model";
 import {
   maskToIndices,
   popcount,
@@ -132,6 +136,12 @@ export function MathExplorer({
               <code>V(∅, T) = 1</code><span>Your decks are complete: you won.</span>
               <code>V(S, ∅) = 0</code><span>The opponent's decks are complete: you lost.</span>
             </div>
+            <p className="math-intro">
+              For readability, next-pick recommendations below{" "}
+              {formatPercent(MIN_VISIBLE_PICK_PROBABILITY, 1)} are omitted from the compact
+              strategy table and PDF. They remain part of every calculation. Ban probabilities
+              are never filtered.
+            </p>
           </article>
 
           <article id="ban-game" className="math-section">

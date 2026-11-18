@@ -49,8 +49,7 @@ function isSolverInput(value: unknown): value is SolverInput {
     typeof input.eventName !== "string" ||
     !Array.isArray(input.myDecks) ||
     !Array.isArray(input.opponentDecks) ||
-    !Array.isArray(input.matrix) ||
-    typeof input.displayThreshold !== "number"
+    !Array.isArray(input.matrix)
   ) {
     return false;
   }

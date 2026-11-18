@@ -1,4 +1,4 @@
-import type { SolverInput } from "../domain/model";
+import { MIN_VISIBLE_PICK_PROBABILITY, type SolverInput } from "../domain/model";
 import type { ConquestSolution } from "../solver/conquest";
 import { formatPercent, heatColor } from "../utils/format";
 import { subsetsForMask } from "../solver/conquest";
@@ -14,7 +14,6 @@ export function DecisionTable({ solution, input, compact = true }: DecisionTable
   const minimumSize = compact ? 2 : 1;
   const myStates = subsetsForMask(solution.myMask, minimumSize);
   const opponentStates = subsetsForMask(solution.opponentMask, minimumSize);
-  const threshold = input.displayThreshold / 100;
 
   return (
     <div className="decision-table-scroll">
@@ -40,7 +39,11 @@ export function DecisionTable({ solution, input, compact = true }: DecisionTable
                 return (
                   <td key={`${myMask}:${opponentMask}`} style={{ background: heatColor(state.value) }}>
                     <strong>{formatPercent(state.value, 1)}</strong>
-                    <StrategyMix strategy={state.myStrategy} decks={input.myDecks} threshold={threshold} />
+                    <StrategyMix
+                      strategy={state.myStrategy}
+                      decks={input.myDecks}
+                      threshold={MIN_VISIBLE_PICK_PROBABILITY}
+                    />
                   </td>
                 );
               })}

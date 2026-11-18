@@ -1,6 +1,12 @@
 import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
-import { classIconUrl, className, type DeckInput, type SolverInput } from "../domain/model";
+import {
+  MIN_VISIBLE_PICK_PROBABILITY,
+  classIconUrl,
+  className,
+  type DeckInput,
+  type SolverInput,
+} from "../domain/model";
 import { subsetsForMask, type BanResult, type ConquestSolution } from "../solver/conquest";
 import { formatPercent } from "../utils/format";
 
@@ -224,7 +230,9 @@ function drawDecisionCard(
       drawBox(page, left, bottom, cellWidth, rowHeight, WHITE);
       centeredText(page, formatPercent(state.value, 1), left + cellWidth / 2, bottom + 22, cellWidth - 3, fonts.bold, 7.6);
       const picks = state.myStrategy.filter(
-        (item) => item.probability > 1e-9 && item.probability + 1e-12 >= input.displayThreshold / 100,
+        (item) =>
+          item.probability > 1e-9 &&
+          item.probability + 1e-12 >= MIN_VISIBLE_PICK_PROBABILITY,
       );
       picks.slice(0, 3).forEach((item, pickIndex) => {
         const pickY = bottom + 13 - pickIndex * 6.5;

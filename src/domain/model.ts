@@ -23,8 +23,9 @@ export interface SolverInput {
   myDecks: DeckInput[];
   opponentDecks: DeckInput[];
   matrix: number[][];
-  displayThreshold: number;
 }
+
+export const MIN_VISIBLE_PICK_PROBABILITY = 0.005;
 
 export function className(classId: HearthstoneClass): string {
   return HEARTHSTONE_CLASSES.find((item) => item.id === classId)?.name ?? classId;
@@ -47,13 +48,12 @@ export function createDefaultInput(): SolverInput {
       [70, 38, 52, 46],
       [51, 55, 49, 60],
     ],
-    displayThreshold: 0.5,
   };
 }
 
 export function cloneInput(input: SolverInput): SolverInput {
   return {
-    ...input,
+    eventName: input.eventName,
     myDecks: input.myDecks.map((deck) => ({ ...deck })),
     opponentDecks: input.opponentDecks.map((deck) => ({ ...deck })),
     matrix: input.matrix.map((row) => [...row]),
@@ -76,13 +76,6 @@ export function validateInput(input: SolverInput): string[] {
     )
   ) {
     errors.push("Every matchup must be a number from 0 to 100.");
-  }
-  if (
-    !Number.isFinite(input.displayThreshold) ||
-    input.displayThreshold < 0 ||
-    input.displayThreshold > 100
-  ) {
-    errors.push("Display threshold must be a number from 0 to 100.");
   }
   return errors;
 }

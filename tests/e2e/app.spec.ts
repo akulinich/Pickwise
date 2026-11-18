@@ -64,6 +64,8 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   test.setTimeout(60_000)
   await page.goto('./')
 
+  await expect(page.getByText('Hide picks below')).toHaveCount(0)
+
   await page.getByRole('button', { name: 'Calculate' }).click()
 
   await expect(page.getByRole('heading', { name: 'Match plan' })).toBeVisible()
@@ -77,6 +79,7 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/0\s*data uploads/)
   await expect(page.getByText('Sixteen complete Conquest games become one 4 × 4 game')).toBeVisible()
   await expect(page.getByText('04 · All 63 reachable states')).toBeVisible()
+  await expect(page.getByText(/next-pick recommendations below 0.5%/)).toBeVisible()
 
   const state = page.locator('details').filter({
     has: page.getByText('V(Warrior, Paladin)', { exact: true }),

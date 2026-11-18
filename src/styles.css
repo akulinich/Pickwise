@@ -205,7 +205,6 @@ footer {
   letter-spacing: -0.035em;
 }
 
-.threshold-field,
 .ban-pair-selectors label,
 .pdf-ban-select,
 .math-pair-selectors label {
@@ -553,20 +552,10 @@ select:hover {
 
 .calculate-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-end;
   gap: 20px;
   margin-top: 20px;
-}
-
-.threshold-field {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.percent-input.compact {
-  width: 84px;
 }
 
 .calculate-action {

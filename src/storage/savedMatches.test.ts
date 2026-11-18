@@ -41,5 +41,28 @@ describe("saved matches", () => {
     storage.setItem("pickwise.saved-matches.v1", "not json");
     expect(listSavedMatches(storage)).toEqual([]);
   });
+
+  it("loads legacy matches and removes the old display-threshold setting", () => {
+    const storage = new MemoryStorage();
+    const legacyInput = { ...createDefaultInput(), displayThreshold: 25 };
+    storage.setItem(
+      "pickwise.saved-matches.v1",
+      JSON.stringify({
+        version: 1,
+        matches: [
+          {
+            id: "legacy match",
+            name: "Legacy match",
+            updatedAt: "2026-01-01T00:00:00.000Z",
+            input: legacyInput,
+          },
+        ],
+      }),
+    );
+
+    const [match] = listSavedMatches(storage);
+    expect(match.name).toBe("Legacy match");
+    expect(match.input).not.toHaveProperty("displayThreshold");
+  });
 });
 
