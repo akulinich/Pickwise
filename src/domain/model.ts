@@ -62,6 +62,9 @@ export function cloneInput(input: SolverInput): SolverInput {
 
 export function validateInput(input: SolverInput): string[] {
   const errors: string[] = [];
+  if (!input.eventName.trim()) {
+    errors.push("Sheet title is required so the calculation can be saved.");
+  }
   if (input.myDecks.length !== 4 || input.opponentDecks.length !== 4) {
     errors.push("Each lineup must contain exactly four decks.");
   }

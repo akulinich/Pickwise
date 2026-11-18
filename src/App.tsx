@@ -14,6 +14,12 @@ import {
   solveBans,
   type BanResult,
 } from "./solver/conquest";
+import {
+  deleteMatch,
+  listSavedMatches,
+  loadMatch,
+  saveMatch,
+} from "./storage/savedMatches";
 
 export default function App() {
   const [input, setInput] = useState<SolverInput>(() => createDefaultInput());
@@ -28,7 +34,30 @@ export default function App() {
   const [showMath, setShowMath] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfError, setPdfError] = useState("");
+  const [savedMatches, setSavedMatches] = useState(() => listSavedMatches());
+  const [selectedSavedMatchId, setSelectedSavedMatchId] = useState("");
+  const [storageMessage, setStorageMessage] = useState("");
+  const [storageMessageIsError, setStorageMessageIsError] = useState(false);
   const validationErrors = useMemo(() => validateInput(input), [input]);
+
+  const showSolution = (snapshot: SolverInput, nextResult: BanResult) => {
+    const ourBan = recommendedBan(nextResult.myBanStrategy);
+    const opponentBan = recommendedBan(nextResult.opponentBanStrategy);
+    setInput(cloneInput(snapshot));
+    setSolvedInput(snapshot);
+    setResult(nextResult);
+    setSelectedViewOurBan(ourBan);
+    setSelectedPdfOurBan(ourBan);
+    setSelectedOpponentBan(opponentBan);
+    setStale(false);
+    setShowMath(false);
+  };
+
+  const scrollToResults = () => {
+    window.setTimeout(() => {
+      document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
 
   const handleInputChange = useCallback(
     (next: SolverInput) => {
@@ -48,25 +77,74 @@ export default function App() {
     setPdfError("");
     window.setTimeout(() => {
       try {
-        const snapshot = cloneInput(input);
+        const snapshot = cloneInput({ ...input, eventName: input.eventName.trim() });
         const nextResult = solveBans(probabilityMatrix(snapshot));
-        const ourBan = recommendedBan(nextResult.myBanStrategy);
-        const opponentBan = recommendedBan(nextResult.opponentBanStrategy);
-        setSolvedInput(snapshot);
-        setResult(nextResult);
-        setSelectedViewOurBan(ourBan);
-        setSelectedPdfOurBan(ourBan);
-        setSelectedOpponentBan(opponentBan);
-        setStale(false);
-        window.setTimeout(() => {
-          document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 0);
+        showSolution(snapshot, nextResult);
+        try {
+          const saved = saveMatch(snapshot);
+          setSavedMatches(listSavedMatches());
+          setSelectedSavedMatchId(saved.id);
+          setStorageMessage(`Saved locally as “${saved.name}”.`);
+          setStorageMessageIsError(false);
+        } catch (error) {
+          setStorageMessage(
+            error instanceof Error ? error.message : "The calculation could not be saved locally.",
+          );
+          setStorageMessageIsError(true);
+        }
+        scrollToResults();
       } catch (error) {
         setCalculationError(error instanceof Error ? error.message : "The solver could not finish.");
       } finally {
         setCalculating(false);
       }
     }, 0);
+  };
+
+  const handleLoadSavedMatch = () => {
+    if (!selectedSavedMatchId) return;
+    const saved = loadMatch(selectedSavedMatchId);
+    if (!saved) {
+      setSavedMatches(listSavedMatches());
+      setSelectedSavedMatchId("");
+      setStorageMessage("That saved match is no longer available.");
+      setStorageMessageIsError(true);
+      return;
+    }
+    setCalculating(true);
+    setCalculationError("");
+    setPdfError("");
+    window.setTimeout(() => {
+      try {
+        const snapshot = cloneInput(saved.input);
+        showSolution(snapshot, solveBans(probabilityMatrix(snapshot)));
+        setStorageMessage(`Loaded “${saved.name}”.`);
+        setStorageMessageIsError(false);
+        scrollToResults();
+      } catch (error) {
+        setCalculationError(error instanceof Error ? error.message : "The saved match could not be loaded.");
+      } finally {
+        setCalculating(false);
+      }
+    }, 0);
+  };
+
+  const handleDeleteSavedMatch = () => {
+    if (!selectedSavedMatchId) return;
+    const saved = savedMatches.find((match) => match.id === selectedSavedMatchId);
+    if (!saved || !window.confirm(`Delete the saved calculation “${saved.name}”?`)) return;
+    try {
+      deleteMatch(saved.id);
+      setSavedMatches(listSavedMatches());
+      setSelectedSavedMatchId("");
+      setStorageMessage(`Deleted “${saved.name}”.`);
+      setStorageMessageIsError(false);
+    } catch (error) {
+      setStorageMessage(
+        error instanceof Error ? error.message : "The saved match could not be deleted.",
+      );
+      setStorageMessageIsError(true);
+    }
   };
 
   const handleDownloadPdf = async () => {
@@ -115,8 +193,15 @@ export default function App() {
           input={input}
           errors={calculationError ? [calculationError] : validationErrors}
           calculating={calculating}
+          savedMatches={savedMatches}
+          selectedSavedMatchId={selectedSavedMatchId}
+          storageMessage={storageMessage}
+          storageMessageIsError={storageMessageIsError}
           onChange={handleInputChange}
           onCalculate={handleCalculate}
+          onSelectedSavedMatch={setSelectedSavedMatchId}
+          onLoadSavedMatch={handleLoadSavedMatch}
+          onDeleteSavedMatch={handleDeleteSavedMatch}
         />
 
         {result && solvedInput && (

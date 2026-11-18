@@ -206,6 +206,7 @@ footer {
 }
 
 .event-field,
+.saved-match-field,
 .threshold-field,
 .ban-pair-selectors label,
 .pdf-ban-select,
@@ -236,6 +237,60 @@ select:hover {
 .event-field input {
   width: min(360px, 40vw);
   padding: 10px 12px;
+}
+
+.saved-matches-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) auto 1fr;
+  align-items: end;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: rgba(12, 19, 32, 0.55);
+}
+
+.saved-match-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.saved-match-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 34px 9px 11px;
+}
+
+.saved-match-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.saved-match-actions .text-button {
+  min-height: 42px;
+  padding-inline: 8px;
+}
+
+.danger-button:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+.storage-message {
+  align-self: center;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.storage-message.error {
+  color: var(--danger);
 }
 
 .matrix-card,
@@ -1174,6 +1229,15 @@ code {
 
   .event-field input {
     width: 100%;
+  }
+
+  .saved-matches-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .saved-match-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
   }
 
   .matrix-card {

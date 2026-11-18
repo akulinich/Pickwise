@@ -25,6 +25,30 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   }
 })
 
+test('saves calculations by match name and loads them after a reload', async ({ page }) => {
+  await page.goto('./')
+
+  await page.getByLabel('Sheet title').fill('Qualifier vs Alex')
+  await page.getByLabel('Warrior win rate against Paladin').fill('67')
+  await page.getByRole('button', { name: 'Calculate strategy' }).click()
+  await expect(page.getByText('Saved locally as “Qualifier vs Alex”.')).toBeVisible()
+
+  await page.reload()
+  const savedCalculations = page.getByRole('combobox', { name: 'Saved calculations' })
+  await savedCalculations.selectOption({ label: 'Qualifier vs Alex' })
+  await page.getByRole('button', { name: 'Load', exact: true }).click()
+
+  await expect(page.getByLabel('Sheet title')).toHaveValue('Qualifier vs Alex')
+  await expect(page.getByLabel('Warrior win rate against Paladin')).toHaveValue('67')
+  await expect(page.getByRole('heading', { name: 'Match plan' })).toBeVisible()
+  await expect(page.getByText('Loaded “Qualifier vs Alex”.')).toBeVisible()
+
+  page.once('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: 'Delete', exact: true }).click()
+  await expect(savedCalculations).toHaveValue('')
+  await expect(savedCalculations.locator('option')).toHaveText('No saved matches yet')
+})
+
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {
   test.setTimeout(60_000)
   await page.goto('./')
