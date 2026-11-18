@@ -1,5 +1,30 @@
 import { expect, test } from '@playwright/test'
 
+test('keeps the matchup matrix scrollable without overlapping cells on a phone', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('./')
+
+  const scroller = page.locator('.matrix-scroll').first()
+  const dimensions = await scroller.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }))
+  expect(dimensions.scrollWidth).toBeGreaterThan(dimensions.clientWidth)
+
+  const cells = page.locator('.input-matrix tbody tr').first().locator('td')
+  const boxes = await cells.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect()
+      return { left: box.left, right: box.right, width: box.width }
+    }),
+  )
+  expect(boxes).toHaveLength(4)
+  for (let index = 0; index < boxes.length - 1; index += 1) {
+    expect(boxes[index].width).toBeGreaterThan(120)
+    expect(boxes[index + 1].left).toBeGreaterThanOrEqual(boxes[index].right - 1)
+  }
+})
+
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {
   test.setTimeout(60_000)
   await page.goto('./')

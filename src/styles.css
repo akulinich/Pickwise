@@ -333,7 +333,10 @@ select:hover {
 
 .matrix-scroll,
 .decision-table-scroll {
+  max-width: 100%;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .input-matrix,
@@ -342,6 +345,10 @@ select:hover {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+}
+
+.input-matrix {
+  min-width: 840px;
 }
 
 .input-matrix th,
@@ -358,6 +365,20 @@ select:hover {
   padding: 8px;
   background: #111b2a;
   text-align: left;
+}
+
+.input-matrix tbody > tr > th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: #111b2a;
+}
+
+.input-matrix thead > tr > th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #111b2a;
 }
 
 .input-matrix thead th {
