@@ -163,6 +163,28 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await expect(importedTable).toBeVisible()
   await expect(importedTable.locator('tbody tr')).toHaveCount(4)
   await expect(importedTable.getByRole('cell', { name: /61\.2%.*200 games/ })).toBeVisible()
+
+  const selectedRow = importedTable.getByRole('button', { name: 'Select row Cycle Rogue' })
+  const selectedColumn = importedTable.getByRole('button', { name: 'Select column Discover Hunter' })
+  await selectedRow.click()
+  await selectedColumn.click()
+  await expect(selectedRow).toHaveAttribute('aria-pressed', 'true')
+  await expect(selectedColumn).toHaveAttribute('aria-pressed', 'true')
+
+  const rowsOnly = importedTable.getByRole('button', { name: /Show selected rows/ })
+  const columnsOnly = importedTable.getByRole('button', { name: /Show selected columns/ })
+  await rowsOnly.click()
+  await columnsOnly.click()
+  await expect(rowsOnly).toHaveAttribute('aria-pressed', 'true')
+  await expect(columnsOnly).toHaveAttribute('aria-pressed', 'true')
+  await expect(importedTable.locator('tbody tr')).toHaveCount(1)
+  await expect(importedTable.locator('thead th')).toHaveCount(2)
+  await expect(importedTable.locator('tbody td')).toHaveCount(1)
+
+  await rowsOnly.click()
+  await columnsOnly.click()
+  await expect(importedTable.locator('tbody tr')).toHaveCount(4)
+  await expect(importedTable.locator('thead th')).toHaveCount(5)
   await page.getByRole('button', { name: 'Close imported table' }).click()
 })
 
