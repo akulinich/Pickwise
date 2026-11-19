@@ -47,6 +47,28 @@ button {
   cursor: pointer;
 }
 
+.source-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.source-button {
+  margin-top: 0;
+  color: #edf1f7;
+  border-color: #40506a;
+  background: #111b2a;
+}
+
+.source-button:hover {
+  border-color: #f2b84b;
+  color: #ffca63;
+}
+
+.export-button {
+  margin-top: 12px;
+}
+
 button:disabled {
   cursor: wait;
   opacity: 0.62;

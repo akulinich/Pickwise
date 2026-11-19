@@ -14,9 +14,9 @@ The result is downloaded locally and no data is sent to Pickwise or any server.
 
 ## Use
 
-1. Open the matchup table on HSGuru or the Matchups tab on HSReplay.
-2. Select **Legend** and **Last 3 days**.
-3. Click the extension and then **Export CSV**.
+1. Click the extension and choose **Open HSGuru** or **Open HSReplay**.
+2. The extension opens the matchup page with **Legend** and **Last 3 days** selected.
+3. After the table loads, click the extension and then **Export current tab to CSV**.
 4. In Pickwise, click **Import CSV** and choose the downloaded file.
 
 Not affiliated with Blizzard Entertainment, HSGuru, or HSReplay.

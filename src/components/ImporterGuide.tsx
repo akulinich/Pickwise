@@ -55,9 +55,9 @@ export function ImporterGuide({ onClose }: ImporterGuideProps) {
             <section>
               <p className="eyebrow">Export and use</p>
               <ol>
-                <li>Open the matchup table on HSGuru or the Matchups tab on HSReplay.</li>
-                <li>Select <strong>Legend</strong> and <strong>Last 3 days</strong>.</li>
-                <li>Click the extension, then <strong>Export CSV</strong>.</li>
+                <li>Click the extension and choose <strong>Open HSGuru</strong> or <strong>Open HSReplay</strong>.</li>
+                <li>Wait for the prefiltered <strong>Legend / Last 3 days</strong> table to load.</li>
+                <li>Click the extension again, then <strong>Export current tab to CSV</strong>.</li>
                 <li>Return to Pickwise and click <strong>Import CSV</strong>.</li>
                 <li>Choose <strong>Imported</strong> as the source and select four decks per lineup.</li>
               </ol>

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Pickwise Matchup Exporter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Exports the open HSGuru or HSReplay matchup table to a local CSV file for Pickwise.",
   "permissions": ["activeTab", "scripting", "downloads"],
   "action": {
