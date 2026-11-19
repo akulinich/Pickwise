@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { ClassPicker } from "./ClassPicker";
 import { ImportedDeckPicker } from "./ImportedDeckPicker";
 import { ImporterGuide } from "./ImporterGuide";
+import { ImportedTableViewer } from "./ImportedTableViewer";
 import { MatchPicker } from "./MatchPicker";
 import { deckName, type SolverInput } from "../domain/model";
 import type { ImportedSnapshot } from "../storage/importedMatchups";
@@ -55,6 +56,7 @@ export function SetupPanel({
 }: SetupPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showImporterGuide, setShowImporterGuide] = useState(false);
+  const [showImportedTable, setShowImportedTable] = useState(false);
   const setMatrixValue = (row: number, column: number, raw: string) => {
     const next = input.matrix.map((values) => [...values]);
     next[row][column] = raw === "" ? Number.NaN : Number(raw);
@@ -164,6 +166,11 @@ export function SetupPanel({
           <button className="secondary-button" type="button" onClick={() => fileInputRef.current?.click()}>
             Import CSV
           </button>
+          {importedSnapshot && input.dataSource === "imported" && (
+            <button className="secondary-button" type="button" onClick={() => setShowImportedTable(true)}>
+              View table
+            </button>
+          )}
           <button className="text-button importer-help-button" type="button" onClick={() => setShowImporterGuide(true)}>
             Get importer
           </button>
@@ -294,6 +301,9 @@ export function SetupPanel({
         </div>
       </div>
       {showImporterGuide && <ImporterGuide onClose={() => setShowImporterGuide(false)} />}
+      {showImportedTable && importedSnapshot && (
+        <ImportedTableViewer snapshot={importedSnapshot} onClose={() => setShowImportedTable(false)} />
+      )}
     </section>
   );
 }

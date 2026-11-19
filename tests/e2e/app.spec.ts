@@ -122,6 +122,13 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('66.4')
   await datasets.selectOption('HSGuru:2026-11-17T12:00:00.000Z')
   await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
+
+  await page.getByRole('button', { name: 'View table' }).click()
+  const importedTable = page.getByRole('dialog', { name: 'Imported matchup table' })
+  await expect(importedTable).toBeVisible()
+  await expect(importedTable.locator('tbody tr')).toHaveCount(4)
+  await expect(importedTable.getByRole('cell', { name: /61\.2%.*200 games/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Close imported table' }).click()
 })
 
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {
