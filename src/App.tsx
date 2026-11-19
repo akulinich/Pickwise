@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SetupPanel } from "./components/SetupPanel";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { MathExplorer } from "./components/MathExplorer";
@@ -15,10 +15,13 @@ import {
   type BanResult,
 } from "./solver/conquest";
 import {
+  clearActiveMatchId,
   deleteMatch,
+  getActiveMatchId,
   listSavedMatches,
   loadMatch,
   saveMatch,
+  setActiveMatchId,
 } from "./storage/savedMatches";
 import {
   importedDeckInput,
@@ -29,8 +32,16 @@ import {
   type ImportedSnapshot,
 } from "./storage/importedMatchups";
 
+function createInitialSession(): { input: SolverInput; activeSavedMatchId: string } {
+  const activeSavedMatchId = getActiveMatchId();
+  const saved = activeSavedMatchId ? loadMatch(activeSavedMatchId) : null;
+  if (!saved) return { input: createDefaultInput(), activeSavedMatchId: "" };
+  return { input: cloneInput(saved.input), activeSavedMatchId: saved.id };
+}
+
 export default function App() {
-  const [input, setInput] = useState<SolverInput>(() => createDefaultInput());
+  const [initialSession] = useState(createInitialSession);
+  const [input, setInput] = useState<SolverInput>(() => initialSession.input);
   const [solvedInput, setSolvedInput] = useState<SolverInput | null>(null);
   const [result, setResult] = useState<BanResult | null>(null);
   const [stale, setStale] = useState(false);
@@ -43,7 +54,10 @@ export default function App() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfError, setPdfError] = useState("");
   const [savedMatches, setSavedMatches] = useState(() => listSavedMatches());
-  const [activeSavedMatchId, setActiveSavedMatchId] = useState("");
+  const [activeSavedMatchId, setActiveSavedMatchIdState] = useState(
+    initialSession.activeSavedMatchId,
+  );
+  const activeSavedMatchIdRef = useRef(initialSession.activeSavedMatchId);
   const [storageMessage, setStorageMessage] = useState("");
   const [storageMessageIsError, setStorageMessageIsError] = useState(false);
   const [importedSnapshots, setImportedSnapshots] = useState<ImportedSnapshot[]>(() => listImportedSnapshots());
@@ -74,14 +88,40 @@ export default function App() {
     }, 0);
   };
 
-  const handleInputChange = useCallback(
-    (next: SolverInput) => {
-      setInput(next);
-      if (result) setStale(true);
+  const rememberActiveMatch = (id: string) => {
+    activeSavedMatchIdRef.current = id;
+    setActiveSavedMatchIdState(id);
+    setActiveMatchId(id);
+  };
+
+  const forgetActiveMatch = () => {
+    activeSavedMatchIdRef.current = "";
+    setActiveSavedMatchIdState("");
+    clearActiveMatchId();
+  };
+
+  const handleInputChange = (next: SolverInput) => {
+    setInput(next);
+    if (result) setStale(true);
+    if (validateInput(next).length > 0) {
       setStorageMessage("");
-    },
-    [result],
-  );
+      return;
+    }
+    try {
+      const previousId = activeSavedMatchIdRef.current;
+      const saved = saveMatch(next);
+      if (previousId && previousId !== saved.id) deleteMatch(previousId);
+      rememberActiveMatch(saved.id);
+      setSavedMatches(listSavedMatches());
+      setStorageMessage("Saved locally.");
+      setStorageMessageIsError(false);
+    } catch (error) {
+      setStorageMessage(
+        error instanceof Error ? error.message : "The match could not be saved locally.",
+      );
+      setStorageMessageIsError(true);
+    }
+  };
 
   const handleCalculate = () => {
     if (validationErrors.length > 0) {
@@ -98,11 +138,12 @@ export default function App() {
         showSolution(snapshot, nextResult);
         try {
           const saved = saveMatch(snapshot);
-          if (activeSavedMatchId && activeSavedMatchId !== saved.id) {
-            deleteMatch(activeSavedMatchId);
+          const previousId = activeSavedMatchIdRef.current;
+          if (previousId && previousId !== saved.id) {
+            deleteMatch(previousId);
           }
           setSavedMatches(listSavedMatches());
-          setActiveSavedMatchId(saved.id);
+          rememberActiveMatch(saved.id);
           setStorageMessage(`Saved locally as “${saved.name}”.`);
           setStorageMessageIsError(false);
         } catch (error) {
@@ -124,7 +165,7 @@ export default function App() {
     const saved = loadMatch(id);
     if (!saved) {
       setSavedMatches(listSavedMatches());
-      if (activeSavedMatchId === id) setActiveSavedMatchId("");
+      if (activeSavedMatchIdRef.current === id) forgetActiveMatch();
       setStorageMessage("That saved match is no longer available.");
       setStorageMessageIsError(true);
       return;
@@ -136,7 +177,7 @@ export default function App() {
       try {
         const snapshot = cloneInput(saved.input);
         showSolution(snapshot, solveBans(probabilityMatrix(snapshot)));
-        setActiveSavedMatchId(saved.id);
+        rememberActiveMatch(saved.id);
         setStorageMessage(`Loaded “${saved.name}”.`);
         setStorageMessageIsError(false);
         scrollToResults();
@@ -154,7 +195,7 @@ export default function App() {
     try {
       deleteMatch(saved.id);
       setSavedMatches(listSavedMatches());
-      if (activeSavedMatchId === saved.id) setActiveSavedMatchId("");
+      if (activeSavedMatchIdRef.current === saved.id) forgetActiveMatch();
       setStorageMessage(`Deleted “${saved.name}”.`);
       setStorageMessageIsError(false);
     } catch (error) {
@@ -182,7 +223,7 @@ export default function App() {
     setPdfError("");
     setStorageMessage("");
     setStorageMessageIsError(false);
-    setActiveSavedMatchId("");
+    forgetActiveMatch();
   };
 
   const withImportedDecks = (snapshot: ImportedSnapshot, current: SolverInput): SolverInput => {

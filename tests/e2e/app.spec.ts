@@ -96,6 +96,30 @@ test('saves calculations by match name and loads them after a reload', async ({ 
   await expect(page.getByText('No saved matches yet')).toBeVisible()
 })
 
+test('automatically restores the current match name and data source after a reload', async ({ page }) => {
+  await page.goto('./')
+
+  await page.getByLabel('Match name').fill('Qualifier vs Sam')
+  await expect(page.getByText('Saved locally.', { exact: true })).toBeVisible()
+  await page.reload()
+  await expect(page.getByLabel('Match name')).toHaveValue('Qualifier vs Sam')
+
+  await page.getByLabel('Choose matchup CSV').setInputFiles({
+    name: 'hsreplay.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(matchupCsv('HSReplay', '2026-11-18T12:00:00.000Z', 66.4)),
+  })
+  await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
+  await page.reload()
+
+  await expect(page.getByLabel('Match name')).toHaveValue('Qualifier vs Sam')
+  await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
+  await expect(page.getByLabel('Imported dataset')).toHaveValue(
+    'HSReplay:2026-11-18T12:00:00.000Z',
+  )
+  await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('66.4')
+})
+
 test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await page.goto('./')
 

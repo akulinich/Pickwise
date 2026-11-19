@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultInput } from "../domain/model";
-import { deleteMatch, listSavedMatches, loadMatch, saveMatch } from "./savedMatches";
+import {
+  clearActiveMatchId,
+  deleteMatch,
+  getActiveMatchId,
+  listSavedMatches,
+  loadMatch,
+  saveMatch,
+  setActiveMatchId,
+} from "./savedMatches";
 
 class MemoryStorage {
   private readonly values = new Map<string, string>();
@@ -40,6 +48,17 @@ describe("saved matches", () => {
     const storage = new MemoryStorage();
     storage.setItem("pickwise.saved-matches.v1", "not json");
     expect(listSavedMatches(storage)).toEqual([]);
+  });
+
+  it("remembers and clears the active match", () => {
+    const storage = new MemoryStorage();
+    expect(getActiveMatchId(storage)).toBe("");
+
+    setActiveMatchId("qualifier-vs-alex", storage);
+    expect(getActiveMatchId(storage)).toBe("qualifier-vs-alex");
+
+    clearActiveMatchId(storage);
+    expect(getActiveMatchId(storage)).toBe("");
   });
 
   it("loads legacy matches and removes the old display-threshold setting", () => {

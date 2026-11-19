@@ -7,6 +7,7 @@ import {
 } from "../domain/model";
 
 const STORAGE_KEY = "pickwise.saved-matches.v1";
+const ACTIVE_MATCH_KEY = "pickwise.active-match.v1";
 const STORAGE_VERSION = 1;
 
 type StorageLike = Pick<Storage, "getItem" | "setItem">;
@@ -144,5 +145,30 @@ export function deleteMatch(
     { ...store, matches: store.matches.filter((match) => match.id !== id) },
     storage,
   );
+}
+
+export function getActiveMatchId(
+  storage: StorageLike | null = browserStorage(),
+): string {
+  if (!storage) return "";
+  try {
+    return storage.getItem(ACTIVE_MATCH_KEY)?.trim() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function setActiveMatchId(
+  id: string,
+  storage: StorageLike | null = browserStorage(),
+): void {
+  if (!storage) throw new Error("Local storage is not available in this browser.");
+  storage.setItem(ACTIVE_MATCH_KEY, id);
+}
+
+export function clearActiveMatchId(
+  storage: StorageLike | null = browserStorage(),
+): void {
+  setActiveMatchId("", storage);
 }
 
