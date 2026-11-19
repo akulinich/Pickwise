@@ -4,7 +4,7 @@ const openHsguruButton = document.getElementById("open-hsguru");
 const openHsreplayButton = document.getElementById("open-hsreplay");
 
 const HSGURU_MATCHUPS_URL = "https://www.hsguru.com/matchups?format=2&rank=legend&period=past_3_days";
-const HSREPLAY_MATCHUPS_URL = "https://hsreplay.net/meta/#rankRange=LEGEND&timeRange=LAST_3_DAYS&tab=matchups";
+const HSREPLAY_MATCHUPS_URL = "https://hsreplay.net/meta/#rankRange=LEGEND&timeFrame=LAST_3_DAYS";
 
 openHsguruButton.addEventListener("click", () => {
   chrome.tabs.create({ url: HSGURU_MATCHUPS_URL });
