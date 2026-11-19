@@ -140,6 +140,12 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   })
   await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
   await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
+  await expect(page.getByLabel('Your deck 1').locator('option')).toHaveText([
+    'Cycle Rogue',
+    'Discover Hunter',
+    'Libram Paladin',
+    'Zarimi Priest',
+  ])
 
   await fileInput.setInputFiles({
     name: 'hsreplay.csv',
