@@ -600,6 +600,7 @@ select:hover {
 .percent-input {
   display: flex;
   align-items: center;
+  justify-content: center;
   min-width: 68px;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -608,8 +609,9 @@ select:hover {
 
 .percent-input input {
   min-width: 0;
-  width: 100%;
-  padding: 8px 4px 8px 9px;
+  width: 5ch;
+  flex: 0 0 5ch;
+  padding: 8px 0;
   border: 0;
   background: transparent;
   text-align: right;
@@ -617,9 +619,10 @@ select:hover {
 }
 
 .percent-input > span {
-  padding-right: 8px;
-  color: var(--muted);
-  font-size: 0.72rem;
+  padding-left: 4px;
+  color: #dfe6ef;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .calculate-row {
@@ -1702,6 +1705,8 @@ code {
   }
 
   .input-matrix .percent-input input {
+    width: 100%;
+    flex-basis: 100%;
     padding: 8px 1px;
     font-size: 0.82rem;
     text-align: center;

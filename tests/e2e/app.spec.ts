@@ -54,6 +54,11 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   await expect(firstInput.locator('..')).toHaveCSS('border-top-width', '0px')
   await firstInput.focus()
   await expect(cells.first()).not.toHaveCSS('box-shadow', 'none')
+
+  await page.setViewportSize({ width: 1180, height: 820 })
+  const firstPercent = firstInput.locator('..')
+  await expect(firstPercent).toHaveCSS('justify-content', 'center')
+  await expect(firstPercent.locator('span').last()).toHaveCSS('color', 'rgb(223, 230, 239)')
 })
 
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {
