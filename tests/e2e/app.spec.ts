@@ -46,9 +46,9 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   const colors = await cells.evaluateAll((elements) =>
     elements.map((element) => getComputedStyle(element).backgroundColor),
   )
-  expect(colors[0]).toContain('69, 191, 131')
-  expect(colors[1]).toContain('239, 100, 100')
-  expect(colors[3]).toBe('rgb(14, 22, 36)')
+  expect(colors[0]).toBe('rgb(223, 238, 178)')
+  expect(colors[1]).toBe('rgb(255, 197, 172)')
+  expect(colors[3]).toBe('rgb(255, 244, 214)')
 
   const firstInput = page.getByLabel('Warrior win rate against Paladin')
   await expect(firstInput.locator('..')).toHaveCSS('border-top-width', '0px')
@@ -58,7 +58,7 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   await page.setViewportSize({ width: 1180, height: 820 })
   const firstPercent = firstInput.locator('..')
   await expect(firstPercent).toHaveCSS('justify-content', 'center')
-  await expect(firstPercent.locator('span').last()).toHaveCSS('color', 'rgb(223, 230, 239)')
+  await expect(firstPercent.locator('span').last()).toHaveCSS('color', 'rgb(52, 64, 84)')
 })
 
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {

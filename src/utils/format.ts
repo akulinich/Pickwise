@@ -33,16 +33,16 @@ export function strategyLabel(
 }
 
 export function heatColor(value: number): string {
-  const distance = Math.min(1, Math.abs(value - 0.5) / 0.28);
-  if (value >= 0.5) return `rgba(69, 191, 131, ${0.08 + distance * 0.25})`;
-  return `rgba(239, 100, 100, ${0.08 + distance * 0.25})`;
+  return matchupInputColor(value * 100);
 }
 
 export function matchupInputColor(percent: number): string {
-  if (!Number.isFinite(percent) || Math.abs(percent - 50) < 1e-12) return "#0e1624";
-  const distance = Math.abs(percent - 50);
-  const alpha = Math.min(0.82, distance * 0.068);
-  return percent > 50
-    ? `rgba(69, 191, 131, ${alpha})`
-    : `rgba(239, 100, 100, ${alpha})`;
+  const neutral = [255, 244, 214];
+  if (!Number.isFinite(percent) || Math.abs(percent - 50) < 1e-12) return "#fff4d6";
+  const target = percent > 50 ? [160, 226, 107] : [255, 155, 135];
+  const intensity = Math.min(1, Math.abs(percent - 50) / 15);
+  const channels = neutral.map((channel, index) =>
+    Math.round(channel + (target[index] - channel) * intensity),
+  );
+  return `#${channels.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 }
