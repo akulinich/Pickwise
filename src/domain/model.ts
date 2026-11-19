@@ -16,10 +16,16 @@ export type HearthstoneClass = (typeof HEARTHSTONE_CLASSES)[number]["id"];
 
 export interface DeckInput {
   classId: HearthstoneClass;
+  name?: string;
+  importedId?: string;
 }
+
+export type MatchupDataSource = "none" | "imported";
 
 export interface SolverInput {
   eventName: string;
+  dataSource: MatchupDataSource;
+  importedSnapshotId?: string;
   myDecks: DeckInput[];
   opponentDecks: DeckInput[];
   matrix: number[][];
@@ -31,6 +37,10 @@ export function className(classId: HearthstoneClass): string {
   return HEARTHSTONE_CLASSES.find((item) => item.id === classId)?.name ?? classId;
 }
 
+export function deckName(deck: DeckInput): string {
+  return deck.name?.trim() || className(deck.classId);
+}
+
 export function classIconUrl(classId: HearthstoneClass): string {
   return `${import.meta.env.BASE_URL}class-icons/${classId}.png`;
 }
@@ -40,6 +50,7 @@ export function createDefaultInput(): SolverInput {
   const opponentClasses: HearthstoneClass[] = ["paladin", "shaman", "priest", "hunter"];
   return {
     eventName: "Conquest match",
+    dataSource: "none",
     myDecks: myClasses.map((classId) => ({ classId })),
     opponentDecks: opponentClasses.map((classId) => ({ classId })),
     matrix: [
@@ -54,6 +65,8 @@ export function createDefaultInput(): SolverInput {
 export function cloneInput(input: SolverInput): SolverInput {
   return {
     eventName: input.eventName,
+    dataSource: input.dataSource ?? "none",
+    importedSnapshotId: input.importedSnapshotId,
     myDecks: input.myDecks.map((deck) => ({ ...deck })),
     opponentDecks: input.opponentDecks.map((deck) => ({ ...deck })),
     matrix: input.matrix.map((row) => [...row]),
@@ -64,6 +77,16 @@ export function validateInput(input: SolverInput): string[] {
   const errors: string[] = [];
   if (!input.eventName.trim()) {
     errors.push("Sheet title is required so the calculation can be saved.");
+  }
+  if (input.dataSource !== "none" && input.dataSource !== "imported") {
+    errors.push("Choose a valid matchup data source.");
+  }
+  if (
+    input.dataSource === "imported" &&
+    (!input.importedSnapshotId ||
+      [...input.myDecks, ...input.opponentDecks].some((deck) => !deck.importedId))
+  ) {
+    errors.push("Choose four imported decks for each lineup.");
   }
   if (input.myDecks.length !== 4 || input.opponentDecks.length !== 4) {
     errors.push("Each lineup must contain exactly four decks.");

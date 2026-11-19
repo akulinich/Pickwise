@@ -1,5 +1,24 @@
 import { expect, test } from '@playwright/test'
 
+function matchupCsv(source: string, capturedAt: string, winRate: number) {
+  const header = 'format_version,source,captured_at,rank,period,source_url,deck,deck_class,opponent_deck,opponent_class,win_rate,games,deck_popularity,opponent_popularity'
+  const decks = [
+    ['Cycle Rogue', 'rogue'],
+    ['Libram Paladin', 'paladin'],
+    ['Zarimi Priest', 'priest'],
+    ['Discover Hunter', 'hunter'],
+  ]
+  const rows = decks.flatMap(([deck, deckClass], row) =>
+    decks.map(([opponent, opponentClass], column) => [
+      1, source, capturedAt, 'Legend', 'Last 3 days', 'https://example.test',
+      deck, deckClass, opponent, opponentClass,
+      row === 0 && column === 1 ? winRate : 50,
+      200, 12 - row, 12 - column,
+    ].join(',')),
+  )
+  return [header, ...rows].join('\n')
+}
+
 test('fits the icon-only matchup matrix without overlapping cells on a phone', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('./')
@@ -70,6 +89,39 @@ test('saves calculations by match name and loads them after a reload', async ({ 
   page.once('dialog', (dialog) => dialog.accept())
   await page.getByRole('button', { name: 'Delete Qualifier final' }).click()
   await expect(page.getByText('No saved matches yet')).toBeVisible()
+})
+
+test('imports and keeps multiple matchup datasets', async ({ page }) => {
+  await page.goto('./')
+
+  await page.getByRole('button', { name: 'Get importer' }).click()
+  const guide = page.getByRole('dialog', { name: 'Import current matchup data' })
+  await expect(guide).toBeVisible()
+  await expect(guide.getByRole('link', { name: 'Download ZIP' })).toHaveAttribute(
+    'href',
+    /downloads\/pickwise-matchup-exporter\.zip$/,
+  )
+  await page.getByRole('button', { name: 'Close importer guide' }).click()
+
+  const fileInput = page.getByLabel('Choose matchup CSV')
+  await fileInput.setInputFiles({
+    name: 'hsguru.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(matchupCsv('HSGuru', '2026-11-17T12:00:00.000Z', 61.2)),
+  })
+  await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
+  await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
+
+  await fileInput.setInputFiles({
+    name: 'hsreplay.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from(matchupCsv('HSReplay', '2026-11-18T12:00:00.000Z', 66.4)),
+  })
+  const datasets = page.getByLabel('Imported dataset')
+  await expect(datasets.locator('option')).toHaveCount(2)
+  await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('66.4')
+  await datasets.selectOption('HSGuru:2026-11-17T12:00:00.000Z')
+  await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
 })
 
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {

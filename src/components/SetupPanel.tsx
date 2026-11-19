@@ -1,6 +1,10 @@
+import { useRef, useState } from "react";
 import { ClassPicker } from "./ClassPicker";
+import { ImportedDeckPicker } from "./ImportedDeckPicker";
+import { ImporterGuide } from "./ImporterGuide";
 import { MatchPicker } from "./MatchPicker";
-import { className, type SolverInput } from "../domain/model";
+import { deckName, type SolverInput } from "../domain/model";
+import type { ImportedSnapshot } from "../storage/importedMatchups";
 import type { SavedMatch } from "../storage/savedMatches";
 import { formatProbabilityInput, matchupInputColor } from "../utils/format";
 
@@ -12,11 +16,19 @@ interface SetupPanelProps {
   activeSavedMatchId: string;
   storageMessage: string;
   storageMessageIsError: boolean;
+  importedSnapshots: ImportedSnapshot[];
+  importedSnapshot: ImportedSnapshot | null;
+  importMessage: string;
+  importMessageIsError: boolean;
   onChange(next: SolverInput): void;
   onCalculate(): void;
   onLoadSavedMatch(id: string): void;
   onDeleteSavedMatch(id: string): void;
   onNewMatch(): void;
+  onImportCsv(file: File): void;
+  onSourceChange(source: SolverInput["dataSource"]): void;
+  onImportedSnapshotChange(snapshotId: string): void;
+  onImportedDeckChange(side: "mine" | "opponent", index: number, deckId: string): void;
 }
 
 export function SetupPanel({
@@ -27,12 +39,22 @@ export function SetupPanel({
   activeSavedMatchId,
   storageMessage,
   storageMessageIsError,
+  importedSnapshots,
+  importedSnapshot,
+  importMessage,
+  importMessageIsError,
   onChange,
   onCalculate,
   onLoadSavedMatch,
   onDeleteSavedMatch,
   onNewMatch,
+  onImportCsv,
+  onSourceChange,
+  onImportedSnapshotChange,
+  onImportedDeckChange,
 }: SetupPanelProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showImporterGuide, setShowImporterGuide] = useState(false);
   const setMatrixValue = (row: number, column: number, raw: string) => {
     const next = input.matrix.map((values) => [...values]);
     next[row][column] = raw === "" ? Number.NaN : Number(raw);
@@ -97,6 +119,69 @@ export function SetupPanel({
         </div>
       </div>
 
+      <div className="data-source-bar">
+        <label className="data-source-select">
+          <span>Matchup data source</span>
+          <select
+            value={input.dataSource}
+            onChange={(event) => onSourceChange(event.target.value as SolverInput["dataSource"])}
+          >
+            <option value="none">No source</option>
+            <option value="imported" disabled={importedSnapshots.length === 0}>
+              {importedSnapshots.length > 0 ? "Imported" : "Imported · import CSV first"}
+            </option>
+          </select>
+        </label>
+        {input.dataSource === "imported" && importedSnapshots.length > 0 && (
+          <label className="data-source-select imported-snapshot-select">
+            <span>Imported dataset</span>
+            <select
+              value={importedSnapshot?.id ?? ""}
+              onChange={(event) => onImportedSnapshotChange(event.target.value)}
+            >
+              {!importedSnapshot && <option value="">Saved dataset is not available</option>}
+              {importedSnapshots.map((snapshot) => (
+                <option key={snapshot.id} value={snapshot.id}>
+                  {snapshot.source} · {new Date(snapshot.capturedAt).toLocaleString()} · {snapshot.rank} · {snapshot.period}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <div className="data-source-actions">
+          <input
+            ref={fileInputRef}
+            className="sr-only"
+            type="file"
+            accept=".csv,text/csv"
+            aria-label="Choose matchup CSV"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) onImportCsv(file);
+              event.target.value = "";
+            }}
+          />
+          <button className="secondary-button" type="button" onClick={() => fileInputRef.current?.click()}>
+            Import CSV
+          </button>
+          <button className="text-button importer-help-button" type="button" onClick={() => setShowImporterGuide(true)}>
+            Get importer
+          </button>
+        </div>
+        <div className="data-source-status">
+          {importedSnapshot && input.dataSource === "imported" && (
+            <span>
+              {importedSnapshot.decks.length} decks · {importedSnapshot.rank} · {importedSnapshot.period}
+            </span>
+          )}
+          {importMessage && (
+            <span className={importMessageIsError ? "error" : ""} role={importMessageIsError ? "alert" : "status"}>
+              {importMessage}
+            </span>
+          )}
+        </div>
+      </div>
+
       <div className="matrix-card">
         <div className="matrix-title-row">
           <div>
@@ -120,11 +205,20 @@ export function SetupPanel({
                 <th className="matrix-corner">Your ↓ / Opponent →</th>
                 {input.opponentDecks.map((deck, index) => (
                   <th key={`opponent-${index}`} scope="col">
-                    <ClassPicker
-                      value={deck.classId}
-                      label={`Opponent deck ${index + 1} class`}
-                      onChange={(classId) => setOpponentClass(index, classId)}
-                    />
+                    {input.dataSource === "imported" && importedSnapshot ? (
+                      <ImportedDeckPicker
+                        value={deck.importedId ?? ""}
+                        label={`Opponent deck ${index + 1}`}
+                        decks={importedSnapshot.decks}
+                        onChange={(deckId) => onImportedDeckChange("opponent", index, deckId)}
+                      />
+                    ) : (
+                      <ClassPicker
+                        value={deck.classId}
+                        label={`Opponent deck ${index + 1} class`}
+                        onChange={(classId) => setOpponentClass(index, classId)}
+                      />
+                    )}
                   </th>
                 ))}
               </tr>
@@ -133,11 +227,20 @@ export function SetupPanel({
               {input.myDecks.map((deck, row) => (
                 <tr key={`mine-${row}`}>
                   <th scope="row">
-                    <ClassPicker
-                      value={deck.classId}
-                      label={`Your deck ${row + 1} class`}
-                      onChange={(classId) => setMyClass(row, classId)}
-                    />
+                    {input.dataSource === "imported" && importedSnapshot ? (
+                      <ImportedDeckPicker
+                        value={deck.importedId ?? ""}
+                        label={`Your deck ${row + 1}`}
+                        decks={importedSnapshot.decks}
+                        onChange={(deckId) => onImportedDeckChange("mine", row, deckId)}
+                      />
+                    ) : (
+                      <ClassPicker
+                        value={deck.classId}
+                        label={`Your deck ${row + 1} class`}
+                        onChange={(classId) => setMyClass(row, classId)}
+                      />
+                    )}
                   </th>
                   {input.opponentDecks.map((opponentDeck, column) => (
                     <td
@@ -146,7 +249,7 @@ export function SetupPanel({
                     >
                       <label className="percent-input">
                         <span className="sr-only">
-                          {className(deck.classId)} win rate against {className(opponentDeck.classId)}
+                          {deckName(deck)} win rate against {deckName(opponentDeck)}
                         </span>
                         <input
                           type="number"
@@ -190,6 +293,7 @@ export function SetupPanel({
           </button>
         </div>
       </div>
+      {showImporterGuide && <ImporterGuide onClose={() => setShowImporterGuide(false)} />}
     </section>
   );
 }

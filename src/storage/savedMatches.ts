@@ -59,7 +59,11 @@ function isSolverInput(value: unknown): value is SolverInput {
       typeof deck === "object" &&
       isClassId((deck as { classId?: unknown }).classId),
   );
-  return decksAreValid && validateInput(input as SolverInput).length === 0;
+  const normalized = {
+    ...input,
+    dataSource: input.dataSource ?? "none",
+  } as SolverInput;
+  return decksAreValid && validateInput(normalized).length === 0;
 }
 
 function isSavedMatch(value: unknown): value is SavedMatch {
@@ -86,7 +90,7 @@ function readStore(storage: StorageLike | null = browserStorage()): SavedMatchSt
       version: STORAGE_VERSION,
       matches: parsed.matches.filter(isSavedMatch).map((match) => ({
         ...match,
-        input: cloneInput(match.input),
+        input: cloneInput({ ...match.input, dataSource: match.input.dataSource ?? "none" }),
       })),
     };
   } catch {

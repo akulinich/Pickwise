@@ -4,6 +4,7 @@ import {
   MIN_VISIBLE_PICK_PROBABILITY,
   classIconUrl,
   className,
+  deckName,
   type DeckInput,
   type SolverInput,
 } from "../domain/model";
@@ -158,7 +159,7 @@ function drawLineup(
     const y = top - 20 - index * 19;
     page.drawRectangle({ x: x + 1, y: y - 2, width: 8, height: 8, borderColor: LINE, borderWidth: 0.55 });
     drawDeckSymbol(page, deck, images, x + 20, y + 2, 13, fonts);
-    drawText(page, className(deck.classId), x + 31, y - 2, width - 65, fonts.regular, 8.4);
+    drawText(page, deckName(deck), x + 31, y - 2, width - 65, fonts.regular, 8.4);
     if (markedBan === index) drawText(page, "BAN", x + width - 28, y - 2, 27, fonts.bold, 7, ACCENT);
   });
 }
@@ -201,7 +202,7 @@ function drawDecisionCard(
   drawBox(page, x, top - height, width, height, WHITE, highlighted ? ACCENT : LINE);
   drawBox(page, x, top - 38, width, 38, highlighted ? ACCENT_FILL : HEADER, highlighted ? ACCENT : LINE);
   drawDeckSymbol(page, input.myDecks[opponentBan], images, x + 16, top - 18, 15, fonts);
-  drawText(page, className(input.myDecks[opponentBan].classId), x + 29, top - 21, width - 84, fonts.bold, 9.5);
+  drawText(page, deckName(input.myDecks[opponentBan]), x + 29, top - 21, width - 84, fonts.bold, 9.5);
   const chance = formatPercent(opponentBanChance, 0);
   drawText(page, chance, x + width - 38, top - 21, 30, fonts.bold, 9.5, highlighted ? ACCENT : INK);
   drawText(page, highlighted ? "Most likely opponent ban" : "Opponent ban", x + 9, top - 33, width - 18, fonts.regular, 7, MUTED);
@@ -276,7 +277,7 @@ export async function generateConquestPdf(
   drawBox(page, banX, 517, 316, 48, HEADER);
   drawText(page, "YOUR BAN FOR THIS SHEET", banX + 12, 551, 283, fonts.bold, 7.4, MUTED);
   drawDeckSymbol(page, input.opponentDecks[selectedOurBan], images, banX + 21, 533, 18, fonts);
-  drawText(page, className(input.opponentDecks[selectedOurBan].classId), banX + 35, 529, 226, fonts.bold, 12);
+  drawText(page, deckName(input.opponentDecks[selectedOurBan]), banX + 35, 529, 226, fonts.bold, 12);
   drawText(page, formatPercent(banWeight, 0), PAGE_WIDTH - margin - 42, 529, 30, fonts.bold, 10);
 
   drawText(page, "Single-game Win Rates", margin, 493, sideWidth, fonts.bold, 12);

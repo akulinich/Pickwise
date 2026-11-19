@@ -3,7 +3,9 @@
 Pickwise is a static, client-side Conquest match planner for Hearthstone. It
 uses the same exact dynamic-programming and zero-sum LP model as the HSAI
 Conquest solver, presents a compact match plan, exposes every calculation in a
-**Show math** view, and exports a one-page A4 landscape match sheet.
+**Show math** view, and exports a one-page A4 landscape match sheet. Matchup
+statistics can be exported from the currently open HSGuru or HSReplay tab with
+the bundled Chrome extension and imported as CSV.
 
 ## Local development
 
@@ -15,8 +17,19 @@ npm run dev
 ```
 
 The Vite development server prints the local URL. All calculations and PDF
-generation happen in the browser; the application has no backend and stores no
-match data.
+generation happen in the browser; the application has no backend. Saved matches
+and imported matchup datasets stay in the browser's local storage.
+
+## Matchup importer
+
+The unpacked Manifest V3 extension source is in `extension/`. The downloadable
+archive served by the site is
+`public/downloads/pickwise-matchup-exporter.zip`. It reads only the active tab
+after an explicit click and downloads a local CSV; it does not send data to a
+server. The in-app **Get importer** guide contains installation and usage steps.
+
+Each CSV capture is stored separately, so a match can select a particular
+HSGuru or HSReplay dataset while other imported variants remain available.
 
 ## Verification
 

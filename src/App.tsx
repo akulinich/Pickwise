@@ -20,6 +20,14 @@ import {
   loadMatch,
   saveMatch,
 } from "./storage/savedMatches";
+import {
+  importedDeckInput,
+  importedMatrix,
+  listImportedSnapshots,
+  parseImportedCsv,
+  saveImportedSnapshot,
+  type ImportedSnapshot,
+} from "./storage/importedMatchups";
 
 export default function App() {
   const [input, setInput] = useState<SolverInput>(() => createDefaultInput());
@@ -38,7 +46,14 @@ export default function App() {
   const [activeSavedMatchId, setActiveSavedMatchId] = useState("");
   const [storageMessage, setStorageMessage] = useState("");
   const [storageMessageIsError, setStorageMessageIsError] = useState(false);
+  const [importedSnapshots, setImportedSnapshots] = useState<ImportedSnapshot[]>(() => listImportedSnapshots());
+  const [importMessage, setImportMessage] = useState("");
+  const [importMessageIsError, setImportMessageIsError] = useState(false);
   const validationErrors = useMemo(() => validateInput(input), [input]);
+  const importedSnapshot = useMemo(
+    () => importedSnapshots.find((snapshot) => snapshot.id === input.importedSnapshotId) ?? null,
+    [importedSnapshots, input.importedSnapshotId],
+  );
 
   const showSolution = (snapshot: SolverInput, nextResult: BanResult) => {
     const ourBan = recommendedBan(nextResult.myBanStrategy);
@@ -170,6 +185,94 @@ export default function App() {
     setActiveSavedMatchId("");
   };
 
+  const withImportedDecks = (snapshot: ImportedSnapshot, current: SolverInput): SolverInput => {
+    const choose = (decks: SolverInput["myDecks"]) =>
+      decks.map((deck, index) => {
+        const imported = snapshot.decks.find((candidate) => candidate.id === deck.importedId)
+          ?? snapshot.decks[index % snapshot.decks.length];
+        return importedDeckInput(imported);
+      });
+    const myDecks = choose(current.myDecks);
+    const opponentDecks = choose(current.opponentDecks);
+    const { matrix, missing } = importedMatrix(snapshot, myDecks, opponentDecks);
+    setImportMessage(
+      missing > 0
+        ? `Imported data has ${missing} missing matchup ${missing === 1 ? "cell" : "cells"}; 50% was used for them.`
+        : `Using ${snapshot.source} data captured ${new Date(snapshot.capturedAt).toLocaleString()}.`,
+    );
+    setImportMessageIsError(false);
+    return {
+      ...current,
+      dataSource: "imported",
+      importedSnapshotId: snapshot.id,
+      myDecks,
+      opponentDecks,
+      matrix,
+    };
+  };
+
+  const handleImportCsv = async (file: File) => {
+    setImportMessage("Reading CSV…");
+    setImportMessageIsError(false);
+    try {
+      const snapshot = parseImportedCsv(await file.text());
+      saveImportedSnapshot(snapshot);
+      setImportedSnapshots(listImportedSnapshots());
+      handleInputChange(withImportedDecks(snapshot, input));
+    } catch (error) {
+      setImportMessage(error instanceof Error ? error.message : "The CSV could not be imported.");
+      setImportMessageIsError(true);
+    }
+  };
+
+  const handleSourceChange = (source: SolverInput["dataSource"]) => {
+    if (source === "imported") {
+      const snapshot = importedSnapshot ?? importedSnapshots[0];
+      if (!snapshot) {
+        setImportMessage("Import a CSV before choosing Imported.");
+        setImportMessageIsError(true);
+        return;
+      }
+      handleInputChange(withImportedDecks(snapshot, input));
+      return;
+    }
+    handleInputChange({
+      ...input,
+      dataSource: "none",
+      importedSnapshotId: undefined,
+      myDecks: input.myDecks.map(({ classId }) => ({ classId })),
+      opponentDecks: input.opponentDecks.map(({ classId }) => ({ classId })),
+    });
+    setImportMessage("");
+    setImportMessageIsError(false);
+  };
+
+  const handleImportedSnapshotChange = (snapshotId: string) => {
+    const snapshot = importedSnapshots.find((item) => item.id === snapshotId);
+    if (!snapshot) return;
+    handleInputChange(withImportedDecks(snapshot, input));
+  };
+
+  const handleImportedDeckChange = (side: "mine" | "opponent", index: number, deckId: string) => {
+    if (!importedSnapshot) return;
+    const selected = importedSnapshot.decks.find((deck) => deck.id === deckId);
+    if (!selected) return;
+    const myDecks = input.myDecks.map((deck, deckIndex) =>
+      side === "mine" && deckIndex === index ? importedDeckInput(selected) : deck,
+    );
+    const opponentDecks = input.opponentDecks.map((deck, deckIndex) =>
+      side === "opponent" && deckIndex === index ? importedDeckInput(selected) : deck,
+    );
+    const { matrix, missing } = importedMatrix(importedSnapshot, myDecks, opponentDecks);
+    handleInputChange({ ...input, myDecks, opponentDecks, matrix });
+    setImportMessage(
+      missing > 0
+        ? `${missing} missing matchup ${missing === 1 ? "cell uses" : "cells use"} 50%.`
+        : "All 16 matchup cells were filled from the imported data.",
+    );
+    setImportMessageIsError(false);
+  };
+
   const handleDownloadPdf = async () => {
     if (!result || !solvedInput || stale) return;
     setPdfBusy(true);
@@ -220,11 +323,19 @@ export default function App() {
           activeSavedMatchId={activeSavedMatchId}
           storageMessage={storageMessage}
           storageMessageIsError={storageMessageIsError}
+          importedSnapshots={importedSnapshots}
+          importedSnapshot={importedSnapshot}
+          importMessage={importMessage}
+          importMessageIsError={importMessageIsError}
           onChange={handleInputChange}
           onCalculate={handleCalculate}
           onLoadSavedMatch={handleLoadSavedMatch}
           onDeleteSavedMatch={handleDeleteSavedMatch}
           onNewMatch={handleNewMatch}
+          onImportCsv={handleImportCsv}
+          onSourceChange={handleSourceChange}
+          onImportedSnapshotChange={handleImportedSnapshotChange}
+          onImportedDeckChange={handleImportedDeckChange}
         />
 
         {result && solvedInput && (

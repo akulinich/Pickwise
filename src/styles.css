@@ -376,6 +376,61 @@ select:hover {
   color: var(--danger);
 }
 
+.data-source-bar {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(260px, 1.3fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: #0d1522;
+}
+
+.data-source-select {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.data-source-select > span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.data-source-select select {
+  min-width: 0;
+  height: 42px;
+  padding: 0 34px 0 11px;
+}
+
+.data-source-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.importer-help-button {
+  white-space: nowrap;
+}
+
+.data-source-status {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.data-source-status .error {
+  color: var(--danger);
+}
+
 .matrix-card,
 .strategy-card,
 .payoff-card,
@@ -906,6 +961,106 @@ footer {
   overflow: hidden;
 }
 
+.guide-backdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 6, 14, 0.78);
+}
+
+.guide-dialog {
+  width: min(820px, 100%);
+  max-height: min(760px, calc(100vh - 40px));
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: #0b1220;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.56);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.guide-header h2 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.guide-content {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.guide-download {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 17px;
+  border: 1px solid #6d5328;
+  background: #201a10;
+}
+
+.guide-download > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.guide-download span,
+.guide-note {
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.guide-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
+  text-decoration: none;
+}
+
+.guide-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.guide-columns section {
+  padding: 18px;
+  background: var(--surface);
+}
+
+.guide-columns ol {
+  margin: 0;
+  padding-left: 22px;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+
+.guide-columns li + li {
+  margin-top: 7px;
+}
+
+.guide-note {
+  margin: 16px 0 0;
+}
+
 .math-backdrop {
   position: fixed;
   z-index: 50;
@@ -1286,6 +1441,14 @@ code {
   .math-ban-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .data-source-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .data-source-actions {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 680px) {
@@ -1329,6 +1492,19 @@ code {
     padding: 10px;
   }
 
+  .data-source-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .data-source-actions,
+  .data-source-status {
+    grid-column: 1;
+  }
+
+  .data-source-actions .secondary-button {
+    flex: 1;
+  }
+
   .input-matrix {
     min-width: 100%;
   }
@@ -1366,6 +1542,10 @@ code {
   .input-matrix th .class-picker select option {
     color: #111827;
     font-size: 1rem;
+  }
+
+  .input-matrix th .imported-deck-picker select {
+    color: transparent;
   }
 
   .input-matrix th .class-icon {
@@ -1431,6 +1611,34 @@ code {
 
   .math-dialog {
     width: 100vw;
+  }
+
+  .guide-backdrop {
+    padding: 0;
+  }
+
+  .guide-dialog {
+    width: 100vw;
+    max-height: 100vh;
+  }
+
+  .guide-header,
+  .guide-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .guide-content {
+    max-height: calc(100vh - 84px);
+  }
+
+  .guide-download {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .guide-columns {
+    grid-template-columns: 1fr;
   }
 
   .math-header,

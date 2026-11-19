@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   MIN_VISIBLE_PICK_PROBABILITY,
-  className,
+  deckName,
   type SolverInput,
 } from "../domain/model";
 import {
@@ -43,7 +43,7 @@ function FormulaCell({
   const value = state.qMatrix[row][column];
   return (
     <div className="formula-cell">
-      <strong>Q[{className(input.myDecks[myDeck].classId)}, {className(input.opponentDecks[opponentDeck].classId)}]</strong>
+      <strong>Q[{deckName(input.myDecks[myDeck])}, {deckName(input.opponentDecks[opponentDeck])}]</strong>
       <code>
         {formatPercent(probability, 1)} × V({stateLabel(winMask, input.myDecks)},{" "}
         {stateLabel(state.opponentMask, input.opponentDecks)}) +{" "}
@@ -152,7 +152,7 @@ export function MathExplorer({
                 row.map((value, columnIndex) => (
                   <div key={`${rowIndex}-${columnIndex}`}>
                     <span>
-                      Ban {className(input.opponentDecks[rowIndex].classId)} / lose {className(input.myDecks[columnIndex].classId)}
+                      Ban {deckName(input.opponentDecks[rowIndex])} / lose {deckName(input.myDecks[columnIndex])}
                     </span>
                     <strong>{formatPercent(value, 3)}</strong>
                   </div>
@@ -176,7 +176,7 @@ export function MathExplorer({
                 <span>You ban</span>
                 <select value={ourBan} onChange={(event) => setOurBan(Number(event.target.value))}>
                   {input.opponentDecks.map((deck, index) => (
-                    <option value={index} key={index}>{className(deck.classId)}</option>
+                    <option value={index} key={index}>{deckName(deck)}</option>
                   ))}
                 </select>
               </label>
@@ -184,7 +184,7 @@ export function MathExplorer({
                 <span>They ban</span>
                 <select value={opponentBan} onChange={(event) => setOpponentBan(Number(event.target.value))}>
                   {input.myDecks.map((deck, index) => (
-                    <option value={index} key={index}>{className(deck.classId)}</option>
+                    <option value={index} key={index}>{deckName(deck)}</option>
                   ))}
                 </select>
               </label>

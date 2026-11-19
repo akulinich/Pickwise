@@ -1,4 +1,4 @@
-import { classIconUrl, className, type SolverInput } from "../domain/model";
+import { classIconUrl, deckName, type SolverInput } from "../domain/model";
 import {
   recommendedBan,
   type BanResult,
@@ -40,7 +40,7 @@ function StrategyList({
         {strategy.map((item) => (
           <div className="strategy-row" key={item.deck}>
             <img src={classIconUrl(decks[item.deck].classId)} alt="" />
-            <span className="strategy-name">{className(decks[item.deck].classId)}</span>
+            <span className="strategy-name">{deckName(decks[item.deck])}</span>
             <span>{formatPercent(item.probability, 1)}</span>
             <i style={{ width: `${Math.max(1, item.probability * 100)}%` }} />
           </div>
@@ -146,7 +146,7 @@ export function ResultsPanel({
                 onChange={(event) => onSelectedViewOurBan(Number(event.target.value))}
               >
                 {input.opponentDecks.map((deck, index) => (
-                  <option key={index} value={index}>{className(deck.classId)}</option>
+                  <option key={index} value={index}>{deckName(deck)}</option>
                 ))}
               </select>
             </label>
@@ -157,7 +157,7 @@ export function ResultsPanel({
                 onChange={(event) => onSelectedOpponentBan(Number(event.target.value))}
               >
                 {input.myDecks.map((deck, index) => (
-                  <option key={index} value={index}>{className(deck.classId)}</option>
+                  <option key={index} value={index}>{deckName(deck)}</option>
                 ))}
               </select>
             </label>
@@ -171,7 +171,7 @@ export function ResultsPanel({
           <p className="eyebrow">A4 landscape match sheet</p>
           <strong>Choose your ban for this PDF</strong>
           <span>
-            The solver recommends {className(input.opponentDecks[defaultBan].classId)}. You can override it.
+            The solver recommends {deckName(input.opponentDecks[defaultBan])}. You can override it.
           </span>
         </div>
         <label className="pdf-ban-select">
@@ -182,7 +182,7 @@ export function ResultsPanel({
           >
             {result.myBanStrategy.map((item) => (
               <option key={item.deck} value={item.deck}>
-                {className(input.opponentDecks[item.deck].classId)} · {formatPercent(item.probability, 1)}
+                {deckName(input.opponentDecks[item.deck])} · {formatPercent(item.probability, 1)}
               </option>
             ))}
           </select>
