@@ -302,7 +302,12 @@ export function SetupPanel({
       </div>
       {showImporterGuide && <ImporterGuide onClose={() => setShowImporterGuide(false)} />}
       {showImportedTable && importedSnapshot && (
-        <ImportedTableViewer snapshot={importedSnapshot} onClose={() => setShowImportedTable(false)} />
+        <ImportedTableViewer
+          snapshot={importedSnapshot}
+          selectedRowIds={input.myDecks.flatMap((deck) => deck.importedId ? [deck.importedId] : [])}
+          selectedColumnIds={input.opponentDecks.flatMap((deck) => deck.importedId ? [deck.importedId] : [])}
+          onClose={() => setShowImportedTable(false)}
+        />
       )}
     </section>
   );

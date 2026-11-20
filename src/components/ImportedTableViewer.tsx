@@ -5,12 +5,24 @@ import { formatProbabilityInput, matchupInputColor } from "../utils/format";
 
 interface ImportedTableViewerProps {
   snapshot: ImportedSnapshot;
+  selectedRowIds: readonly string[];
+  selectedColumnIds: readonly string[];
   onClose(): void;
 }
 
-export function ImportedTableViewer({ snapshot, onClose }: ImportedTableViewerProps) {
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(() => new Set());
-  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(() => new Set());
+export function ImportedTableViewer({
+  snapshot,
+  selectedRowIds,
+  selectedColumnIds,
+  onClose,
+}: ImportedTableViewerProps) {
+  const availableDeckIds = new Set(snapshot.decks.map((deck) => deck.id));
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(
+    () => new Set(selectedRowIds.filter((id) => availableDeckIds.has(id))),
+  );
+  const [selectedColumns, setSelectedColumns] = useState<Set<string>>(
+    () => new Set(selectedColumnIds.filter((id) => availableDeckIds.has(id))),
+  );
   const [showSelectedRows, setShowSelectedRows] = useState(false);
   const [showSelectedColumns, setShowSelectedColumns] = useState(false);
 

@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test'
 
-function matchupCsv(source: string, capturedAt: string, winRate: number) {
+function matchupCsv(source: string, capturedAt: string, winRate: number, includeExtraDeck = false) {
   const header = 'format_version,source,captured_at,rank,period,source_url,deck,deck_class,opponent_deck,opponent_class,win_rate,games,deck_popularity,opponent_popularity'
   const decks = [
     ['Cycle Rogue', 'rogue'],
     ['Libram Paladin', 'paladin'],
     ['Zarimi Priest', 'priest'],
     ['Discover Hunter', 'hunter'],
+    ...(includeExtraDeck ? [['Control Warrior', 'warrior']] : []),
   ]
   const rows = decks.flatMap(([deck, deckClass], row) =>
     decks.map(([opponent, opponentClass], column) => [
@@ -136,11 +137,12 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await fileInput.setInputFiles({
     name: 'hsguru.csv',
     mimeType: 'text/csv',
-    buffer: Buffer.from(matchupCsv('HSGuru', '2026-11-17T12:00:00.000Z', 61.2)),
+    buffer: Buffer.from(matchupCsv('HSGuru', '2026-11-17T12:00:00.000Z', 61.2, true)),
   })
   await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
   await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
   await expect(page.getByLabel('Your deck 1').locator('option')).toHaveText([
+    'Control Warrior',
     'Cycle Rogue',
     'Discover Hunter',
     'Libram Paladin',
@@ -161,15 +163,27 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await page.getByRole('button', { name: 'View table' }).click()
   const importedTable = page.getByRole('dialog', { name: 'Imported matchup table' })
   await expect(importedTable).toBeVisible()
-  await expect(importedTable.locator('tbody tr')).toHaveCount(4)
+  await expect(importedTable.locator('tbody tr')).toHaveCount(5)
   await expect(importedTable.getByRole('cell', { name: /61\.2%.*200 games/ })).toBeVisible()
 
-  const selectedRow = importedTable.getByRole('button', { name: 'Select row Cycle Rogue' })
-  const selectedColumn = importedTable.getByRole('button', { name: 'Select column Discover Hunter' })
-  await selectedRow.click()
-  await selectedColumn.click()
-  await expect(selectedRow).toHaveAttribute('aria-pressed', 'true')
-  await expect(selectedColumn).toHaveAttribute('aria-pressed', 'true')
+  for (const deck of ['Cycle Rogue', 'Libram Paladin', 'Zarimi Priest', 'Discover Hunter']) {
+    await expect(importedTable.getByRole('button', { name: `Select row ${deck}` })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(importedTable.getByRole('button', { name: `Select column ${deck}` })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  }
+  await expect(importedTable.getByRole('button', { name: 'Select row Control Warrior' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
+  await expect(importedTable.getByRole('button', { name: 'Select column Control Warrior' })).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  )
 
   const rowsOnly = importedTable.getByRole('button', { name: /Show selected rows/ })
   const columnsOnly = importedTable.getByRole('button', { name: /Show selected columns/ })
@@ -177,14 +191,14 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await columnsOnly.click()
   await expect(rowsOnly).toHaveAttribute('aria-pressed', 'true')
   await expect(columnsOnly).toHaveAttribute('aria-pressed', 'true')
-  await expect(importedTable.locator('tbody tr')).toHaveCount(1)
-  await expect(importedTable.locator('thead th')).toHaveCount(2)
-  await expect(importedTable.locator('tbody td')).toHaveCount(1)
+  await expect(importedTable.locator('tbody tr')).toHaveCount(4)
+  await expect(importedTable.locator('thead th')).toHaveCount(5)
+  await expect(importedTable.locator('tbody td')).toHaveCount(16)
 
   await rowsOnly.click()
   await columnsOnly.click()
-  await expect(importedTable.locator('tbody tr')).toHaveCount(4)
-  await expect(importedTable.locator('thead th')).toHaveCount(5)
+  await expect(importedTable.locator('tbody tr')).toHaveCount(5)
+  await expect(importedTable.locator('thead th')).toHaveCount(6)
   await page.getByRole('button', { name: 'Close imported table' }).click()
 })
 
