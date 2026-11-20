@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ClassPicker } from "./ClassPicker";
-import { ImportedDeckPicker } from "./ImportedDeckPicker";
+import { ImportedDeckPicker, type ImportedDeckChoice } from "./ImportedDeckPicker";
 import { ImporterGuide } from "./ImporterGuide";
 import { ImportedTableViewer } from "./ImportedTableViewer";
 import { MatchPicker } from "./MatchPicker";
@@ -29,7 +29,7 @@ interface SetupPanelProps {
   onImportCsv(file: File): void;
   onSourceChange(source: SolverInput["dataSource"]): void;
   onImportedSnapshotChange(snapshotId: string): void;
-  onImportedDeckChange(side: "mine" | "opponent", index: number, deckId: string): void;
+  onImportedDeckChange(side: "mine" | "opponent", index: number, choice: ImportedDeckChoice): void;
 }
 
 export function SetupPanel({
@@ -214,10 +214,10 @@ export function SetupPanel({
                   <th key={`opponent-${index}`} scope="col">
                     {input.dataSource === "imported" && importedSnapshot ? (
                       <ImportedDeckPicker
-                        value={deck.importedId ?? ""}
+                        value={deck}
                         label={`Opponent deck ${index + 1}`}
                         decks={importedSnapshot.decks}
-                        onChange={(deckId) => onImportedDeckChange("opponent", index, deckId)}
+                        onChange={(choice) => onImportedDeckChange("opponent", index, choice)}
                       />
                     ) : (
                       <ClassPicker
@@ -236,10 +236,10 @@ export function SetupPanel({
                   <th scope="row">
                     {input.dataSource === "imported" && importedSnapshot ? (
                       <ImportedDeckPicker
-                        value={deck.importedId ?? ""}
+                        value={deck}
                         label={`Your deck ${row + 1}`}
                         decks={importedSnapshot.decks}
-                        onChange={(deckId) => onImportedDeckChange("mine", row, deckId)}
+                        onChange={(choice) => onImportedDeckChange("mine", row, choice)}
                       />
                     ) : (
                       <ClassPicker

@@ -61,6 +61,19 @@ describe("imported matchup CSV", () => {
     expect(result.matrix[rogue][paladin]).toBe(61.2);
   });
 
+  it("uses 50% for a manually selected class that is absent from the import", () => {
+    const snapshot = parseImportedCsv(csv("2026-11-18T12:00:00.000Z"));
+    const importedDecks = snapshot.decks.map(importedDeckInput);
+    const result = importedMatrix(
+      snapshot,
+      [{ classId: "warlock" }, ...importedDecks.slice(1)],
+      importedDecks,
+    );
+
+    expect(result.missing).toBe(4);
+    expect(result.matrix[0]).toEqual([50, 50, 50, 50]);
+  });
+
   it("keeps multiple captured datasets in local storage", () => {
     const storage = new MemoryStorage();
     saveImportedSnapshot(parseImportedCsv(csv("2026-11-17T12:00:00.000Z")), storage);

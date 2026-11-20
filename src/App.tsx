@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { SetupPanel } from "./components/SetupPanel";
+import type { ImportedDeckChoice } from "./components/ImportedDeckPicker";
 import { ResultsPanel } from "./components/ResultsPanel";
 import { MathExplorer } from "./components/MathExplorer";
 import {
@@ -294,15 +295,25 @@ export default function App() {
     handleInputChange(withImportedDecks(snapshot, input));
   };
 
-  const handleImportedDeckChange = (side: "mine" | "opponent", index: number, deckId: string) => {
+  const handleImportedDeckChange = (
+    side: "mine" | "opponent",
+    index: number,
+    choice: ImportedDeckChoice,
+  ) => {
     if (!importedSnapshot) return;
-    const selected = importedSnapshot.decks.find((deck) => deck.id === deckId);
-    if (!selected) return;
+    let nextDeck: SolverInput["myDecks"][number];
+    if (choice.kind === "imported") {
+      const selected = importedSnapshot.decks.find((deck) => deck.id === choice.id);
+      if (!selected) return;
+      nextDeck = importedDeckInput(selected);
+    } else {
+      nextDeck = { classId: choice.classId };
+    }
     const myDecks = input.myDecks.map((deck, deckIndex) =>
-      side === "mine" && deckIndex === index ? importedDeckInput(selected) : deck,
+      side === "mine" && deckIndex === index ? nextDeck : deck,
     );
     const opponentDecks = input.opponentDecks.map((deck, deckIndex) =>
-      side === "opponent" && deckIndex === index ? importedDeckInput(selected) : deck,
+      side === "opponent" && deckIndex === index ? nextDeck : deck,
     );
     const { matrix, missing } = importedMatrix(importedSnapshot, myDecks, opponentDecks);
     handleInputChange({ ...input, myDecks, opponentDecks, matrix });

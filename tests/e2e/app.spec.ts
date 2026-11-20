@@ -141,12 +141,26 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   })
   await expect(page.getByLabel('Matchup data source')).toHaveValue('imported')
   await expect(page.getByLabel('Cycle Rogue win rate against Libram Paladin')).toHaveValue('61.2')
-  await expect(page.getByLabel('Your deck 1').locator('option')).toHaveText([
+  const firstDeckPicker = page.getByLabel('Your deck 1')
+  await expect(firstDeckPicker.locator('optgroup[label="Imported decks"] option')).toHaveText([
     'Control Warrior',
     'Cycle Rogue',
     'Discover Hunter',
     'Libram Paladin',
     'Zarimi Priest',
+  ])
+  await expect(firstDeckPicker.locator('optgroup[label="Classes · manual"] option')).toHaveText([
+    'Death Knight',
+    'Demon Hunter',
+    'Druid',
+    'Hunter',
+    'Mage',
+    'Paladin',
+    'Priest',
+    'Rogue',
+    'Shaman',
+    'Warlock',
+    'Warrior',
   ])
 
   await fileInput.setInputFiles({
@@ -200,6 +214,17 @@ test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await expect(importedTable.locator('tbody tr')).toHaveCount(5)
   await expect(importedTable.locator('thead th')).toHaveCount(6)
   await page.getByRole('button', { name: 'Close imported table' }).click()
+
+  await page.getByLabel('Opponent deck 1').selectOption('class:warlock')
+  const manualMatchup = page.getByLabel('Cycle Rogue win rate against Warlock')
+  await expect(manualMatchup).toHaveValue('50')
+  await manualMatchup.fill('37')
+  await expect(manualMatchup).toHaveValue('37')
+  await page.reload()
+  await expect(page.getByLabel('Opponent deck 1')).toHaveValue('class:warlock')
+  await expect(page.getByLabel('Cycle Rogue win rate against Warlock')).toHaveValue('37')
+  await page.getByRole('button', { name: 'Calculate strategy' }).click()
+  await expect(page.getByRole('heading', { name: 'Match plan' })).toBeVisible()
 })
 
 test('calculates the match, explains the math, and exports a PDF', async ({ page }) => {

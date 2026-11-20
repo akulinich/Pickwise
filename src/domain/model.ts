@@ -81,12 +81,8 @@ export function validateInput(input: SolverInput): string[] {
   if (input.dataSource !== "none" && input.dataSource !== "imported") {
     errors.push("Choose a valid matchup data source.");
   }
-  if (
-    input.dataSource === "imported" &&
-    (!input.importedSnapshotId ||
-      [...input.myDecks, ...input.opponentDecks].some((deck) => !deck.importedId))
-  ) {
-    errors.push("Choose four imported decks for each lineup.");
+  if (input.dataSource === "imported" && !input.importedSnapshotId) {
+    errors.push("Choose an imported dataset.");
   }
   if (input.myDecks.length !== 4 || input.opponentDecks.length !== 4) {
     errors.push("Each lineup must contain exactly four decks.");
