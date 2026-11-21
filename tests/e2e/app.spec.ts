@@ -71,6 +71,8 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
 test('keeps import tools hidden until the private shortcut is used', async ({ page }) => {
   await page.goto('./')
 
+  await expect(page.locator('.brand-mark')).toHaveAttribute('src', /pickwise-mark\.svg$/)
+
   await expect(page.getByRole('link', { name: 'Report a problem' })).toHaveAttribute(
     'href',
     'https://github.com/akulinich/Pickwise/issues/new',

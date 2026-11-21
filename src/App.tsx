@@ -382,7 +382,11 @@ export default function App() {
     <div className="app-shell">
       <header className="site-header">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Pickwise home">
-          <span className="brand-mark">PW</span>
+          <img
+            className="brand-mark"
+            src={`${import.meta.env.BASE_URL}pickwise-mark.svg`}
+            alt=""
+          />
           <span>
             <strong>Pickwise</strong>
             <small>Conquest solver</small>
