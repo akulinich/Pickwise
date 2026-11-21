@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SetupPanel } from "./components/SetupPanel";
 import type { ImportedDeckChoice } from "./components/ImportedDeckPicker";
 import { ResultsPanel } from "./components/ResultsPanel";
@@ -33,6 +33,17 @@ import {
   type ImportedSnapshot,
 } from "./storage/importedMatchups";
 
+const IMPORT_TOOLS_VISIBILITY_KEY = "pickwise.import-tools-visible.v1";
+
+function importToolsInitiallyVisible(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(IMPORT_TOOLS_VISIBILITY_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function createInitialSession(): { input: SolverInput; activeSavedMatchId: string } {
   const activeSavedMatchId = getActiveMatchId();
   const saved = activeSavedMatchId ? loadMatch(activeSavedMatchId) : null;
@@ -42,6 +53,7 @@ function createInitialSession(): { input: SolverInput; activeSavedMatchId: strin
 
 export default function App() {
   const [initialSession] = useState(createInitialSession);
+  const [showImportTools, setShowImportTools] = useState(importToolsInitiallyVisible);
   const [input, setInput] = useState<SolverInput>(() => initialSession.input);
   const [solvedInput, setSolvedInput] = useState<SolverInput | null>(null);
   const [result, setResult] = useState<BanResult | null>(null);
@@ -69,6 +81,32 @@ export default function App() {
     () => importedSnapshots.find((snapshot) => snapshot.id === input.importedSnapshotId) ?? null,
     [importedSnapshots, input.importedSnapshotId],
   );
+
+  useEffect(() => {
+    const toggleImportTools = (event: KeyboardEvent) => {
+      if (
+        event.code !== "KeyD" ||
+        !event.altKey ||
+        !event.shiftKey ||
+        event.ctrlKey ||
+        event.metaKey
+      ) {
+        return;
+      }
+      event.preventDefault();
+      setShowImportTools((current) => {
+        const next = !current;
+        try {
+          window.localStorage.setItem(IMPORT_TOOLS_VISIBILITY_KEY, next ? "1" : "0");
+        } catch {
+          // The shortcut still works for this page when storage is unavailable.
+        }
+        return next;
+      });
+    };
+    window.addEventListener("keydown", toggleImportTools);
+    return () => window.removeEventListener("keydown", toggleImportTools);
+  }, []);
 
   const showSolution = (snapshot: SolverInput, nextResult: BanResult) => {
     const ourBan = recommendedBan(nextResult.myBanStrategy);
@@ -369,6 +407,7 @@ export default function App() {
 
         <SetupPanel
           input={input}
+          showImportTools={showImportTools}
           errors={calculationError ? [calculationError] : validationErrors}
           calculating={calculating}
           savedMatches={savedMatches}

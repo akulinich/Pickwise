@@ -11,6 +11,7 @@ import { formatProbabilityInput, matchupInputColor } from "../utils/format";
 
 interface SetupPanelProps {
   input: SolverInput;
+  showImportTools: boolean;
   errors: string[];
   calculating: boolean;
   savedMatches: SavedMatch[];
@@ -34,6 +35,7 @@ interface SetupPanelProps {
 
 export function SetupPanel({
   input,
+  showImportTools,
   errors,
   calculating,
   savedMatches,
@@ -121,7 +123,7 @@ export function SetupPanel({
         </div>
       </div>
 
-      <div className="data-source-bar">
+      {showImportTools && <div className="data-source-bar">
         <label className="data-source-select">
           <span>Matchup data source</span>
           <select
@@ -187,7 +189,7 @@ export function SetupPanel({
             </span>
           )}
         </div>
-      </div>
+      </div>}
 
       <div className="matrix-card">
         <div className="matrix-title-row">

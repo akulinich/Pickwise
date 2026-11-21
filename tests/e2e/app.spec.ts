@@ -62,6 +62,25 @@ test('fits the icon-only matchup matrix without overlapping cells on a phone', a
   await expect(firstPercent.locator('span').last()).toHaveCSS('color', 'rgb(52, 64, 84)')
 })
 
+test('keeps import tools hidden until the private shortcut is used', async ({ page }) => {
+  await page.goto('./')
+
+  await expect(page.getByLabel('Matchup data source')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Import CSV' })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Get importer' })).toHaveCount(0)
+  await expect(page.getByLabel('Your deck 1 class')).toBeVisible()
+
+  await page.keyboard.press('Alt+Shift+D')
+  await expect(page.getByLabel('Matchup data source')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Import CSV' })).toBeVisible()
+
+  await page.reload()
+  await expect(page.getByLabel('Matchup data source')).toBeVisible()
+
+  await page.keyboard.press('Alt+Shift+D')
+  await expect(page.getByLabel('Matchup data source')).toHaveCount(0)
+})
+
 test('saves calculations by match name and loads them after a reload', async ({ page }) => {
   await page.goto('./')
 
@@ -99,6 +118,7 @@ test('saves calculations by match name and loads them after a reload', async ({ 
 
 test('automatically restores the current match name and data source after a reload', async ({ page }) => {
   await page.goto('./')
+  await page.keyboard.press('Alt+Shift+D')
 
   await page.getByLabel('Match name').fill('Qualifier vs Sam')
   await expect(page.getByText('Saved locally.', { exact: true })).toBeVisible()
@@ -123,6 +143,7 @@ test('automatically restores the current match name and data source after a relo
 
 test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await page.goto('./')
+  await page.keyboard.press('Alt+Shift+D')
 
   await page.getByRole('button', { name: 'Get importer' }).click()
   const guide = page.getByRole('dialog', { name: 'Import current matchup data' })
