@@ -452,7 +452,16 @@ export default function App() {
 
       <footer>
         <span>Pickwise runs entirely in your browser.</span>
-        <span>Not affiliated with Blizzard Entertainment.</span>
+        <div className="footer-meta">
+          <span>Not affiliated with Blizzard Entertainment.</span>
+          <a
+            href="https://github.com/akulinich/Pickwise/issues/new"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Report a problem
+          </a>
+        </div>
       </footer>
 
       {showMath && result && solvedInput && (
