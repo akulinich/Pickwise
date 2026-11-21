@@ -112,14 +112,73 @@ export function MathExplorer({
 
         <div className="math-content">
           <nav className="math-index" aria-label="Math sections">
+            <a href="#method">Method</a>
             <a href="#notation">Notation</a>
             <a href="#ban-game">Ban game</a>
             <a href="#post-ban">Post-ban game</a>
             <a href="#states">All states</a>
           </nav>
 
+          <article id="method" className="math-section">
+            <p className="eyebrow">01 · Method</p>
+            <h3>Dynamic programming over zero-sum games</h3>
+            <p className="math-intro">
+              Pickwise solves the match backwards. A state records exactly which decks on each
+              side still need a win. Smaller states are solved first and cached, so every
+              reachable state is evaluated once and then reused by its parents.
+            </p>
+            <div className="method-grid">
+              <div>
+                <strong>State</strong>
+                <p>
+                  <code>V(S,T)</code> is your probability of winning from remaining deck sets{" "}
+                  <code>S</code> and <code>T</code>. Empty sets are terminal wins or losses.
+                </p>
+              </div>
+              <div>
+                <strong>Transition</strong>
+                <p>
+                  For every possible next pairing, the winner&apos;s deck leaves its set. The
+                  matchup probability combines the two smaller continuation values.
+                </p>
+              </div>
+              <div>
+                <strong>Mixed strategies</strong>
+                <p>
+                  At each state both players choose simultaneously and may randomize. Pickwise
+                  solves the resulting payoff matrix with primal and dual linear programs.
+                </p>
+              </div>
+              <div>
+                <strong>Nash equilibrium</strong>
+                <p>
+                  The optimal distributions form a mixed-strategy Nash equilibrium: neither
+                  player can improve by changing strategy alone. In this zero-sum game, both
+                  minimax values are equal.
+                </p>
+              </div>
+            </div>
+            <div className="method-equations" aria-label="Solver equations">
+              <div>
+                <span>Continuation value for choosing decks i and j</span>
+                <code>
+                  Qᵢⱼ(S,T) = Pᵢⱼ · V(S ∖ &#123;i&#125;, T) + (1 − Pᵢⱼ) · V(S, T ∖ &#123;j&#125;)
+                </code>
+              </div>
+              <div>
+                <span>Mixed-strategy value of the state</span>
+                <code>V(S,T) = maxₓ minᵧ xᵀQy = minᵧ maxₓ xᵀQy</code>
+              </div>
+            </div>
+            <p className="math-intro method-conclusion">
+              After a ban pair leaves three decks per side, dynamic programming evaluates all
+              63 reachable post-ban states. The sixteen resulting root values form the final
+              4 × 4 ban game, which is solved by the same mixed-strategy minimax method.
+            </p>
+          </article>
+
           <article id="notation" className="math-section">
-            <p className="eyebrow">01 · Notation</p>
+            <p className="eyebrow">02 · Notation</p>
             <h3>One value for every actual set of decks</h3>
             <div className="math-scope" aria-label="Calculation scope">
               <div><strong>16</strong><span>ban pairs</span></div>
@@ -145,7 +204,7 @@ export function MathExplorer({
           </article>
 
           <article id="ban-game" className="math-section">
-            <p className="eyebrow">02 · Ban game</p>
+            <p className="eyebrow">03 · Ban game</p>
             <h3>Sixteen complete Conquest games become one 4 × 4 game</h3>
             <div className="math-ban-grid">
               {result.payoffMatrix.map((row, rowIndex) =>
@@ -170,7 +229,7 @@ export function MathExplorer({
           </article>
 
           <article id="post-ban" className="math-section">
-            <p className="eyebrow">03 · Choose one of all 16 post-ban games</p>
+            <p className="eyebrow">04 · Choose one of all 16 post-ban games</p>
             <div className="math-pair-selectors">
               <label>
                 <span>You ban</span>
@@ -197,7 +256,7 @@ export function MathExplorer({
           </article>
 
           <article id="states" className="math-section states-section">
-            <p className="eyebrow">04 · All {states.length} reachable states</p>
+            <p className="eyebrow">05 · All {states.length} reachable states</p>
             <h3>From base cases to the 3 × 3 root</h3>
             <p className="math-intro">
               Open any state to see its complete Q matrix, numeric substitutions, both optimal

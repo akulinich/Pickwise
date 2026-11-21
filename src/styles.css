@@ -1426,6 +1426,64 @@ footer {
   font-size: 1.25rem;
 }
 
+.method-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.method-grid > div {
+  min-height: 132px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.method-grid strong {
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+}
+
+.method-grid p {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.method-equations {
+  display: grid;
+  gap: 1px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  background: var(--line);
+}
+
+.method-equations > div {
+  display: grid;
+  gap: 9px;
+  padding: 15px 16px;
+  background: #f2f8f4;
+}
+
+.method-equations span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.method-equations code {
+  overflow-wrap: anywhere;
+  color: #173f35;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.method-conclusion {
+  margin-top: 18px;
+}
+
 .math-scope {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1969,6 +2027,7 @@ code {
   }
 
   .notation-grid,
+  .method-grid,
   .math-ban-grid,
   .lp-summary,
   .formula-grid {

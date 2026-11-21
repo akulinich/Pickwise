@@ -1,4 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+async function enableImportTools(page: Page) {
+  await page.evaluate(() => localStorage.setItem('pickwise.import-tools-visible.v1', '1'))
+  await page.reload()
+  await expect(page.getByLabel('Matchup data source')).toBeVisible()
+}
 
 function matchupCsv(source: string, capturedAt: string, winRate: number, includeExtraDeck = false) {
   const header = 'format_version,source,captured_at,rank,period,source_url,deck,deck_class,opponent_deck,opponent_class,win_rate,games,deck_popularity,opponent_popularity'
@@ -118,7 +124,7 @@ test('saves calculations by match name and loads them after a reload', async ({ 
 
 test('automatically restores the current match name and data source after a reload', async ({ page }) => {
   await page.goto('./')
-  await page.keyboard.press('Alt+Shift+D')
+  await enableImportTools(page)
 
   await page.getByLabel('Match name').fill('Qualifier vs Sam')
   await expect(page.getByText('Saved locally.', { exact: true })).toBeVisible()
@@ -143,7 +149,7 @@ test('automatically restores the current match name and data source after a relo
 
 test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await page.goto('./')
-  await page.keyboard.press('Alt+Shift+D')
+  await enableImportTools(page)
 
   await page.getByRole('button', { name: 'Get importer' }).click()
   const guide = page.getByRole('dialog', { name: 'Import current matchup data' })
@@ -265,8 +271,11 @@ test('calculates the match, explains the math, and exports a PDF', async ({ page
   await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/16\s*ban pairs/)
   await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/63\s*reachable states per post-ban game/)
   await expect(page.locator('[aria-label="Calculation scope"]')).toContainText(/0\s*data uploads/)
+  await expect(page.getByRole('heading', { name: 'Dynamic programming over zero-sum games' })).toBeVisible()
+  await expect(page.getByText(/mixed-strategy Nash equilibrium/)).toBeVisible()
+  await expect(page.getByText(/63 reachable post-ban states/)).toBeVisible()
   await expect(page.getByText('Sixteen complete Conquest games become one 4 × 4 game')).toBeVisible()
-  await expect(page.getByText('04 · All 63 reachable states')).toBeVisible()
+  await expect(page.getByText('05 · All 63 reachable states')).toBeVisible()
   await expect(page.getByText(/next-pick recommendations below 0.5%/)).toBeVisible()
 
   const state = page.locator('details').filter({
