@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { ClassPicker } from "./ClassPicker";
 import { ImportedDeckPicker, type ImportedDeckChoice } from "./ImportedDeckPicker";
-import { ImporterGuide } from "./ImporterGuide";
 import { ImportedTableViewer } from "./ImportedTableViewer";
 import { MatchPicker } from "./MatchPicker";
 import { deckName, type SolverInput } from "../domain/model";
@@ -57,7 +56,6 @@ export function SetupPanel({
   onImportedDeckChange,
 }: SetupPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showImporterGuide, setShowImporterGuide] = useState(false);
   const [showImportedTable, setShowImportedTable] = useState(false);
   const setMatrixValue = (row: number, column: number, raw: string) => {
     const next = input.matrix.map((values) => [...values]);
@@ -173,9 +171,6 @@ export function SetupPanel({
               View table
             </button>
           )}
-          <button className="text-button importer-help-button" type="button" onClick={() => setShowImporterGuide(true)}>
-            Get importer
-          </button>
         </div>
         <div className="data-source-status">
           {importedSnapshot && input.dataSource === "imported" && (
@@ -302,7 +297,6 @@ export function SetupPanel({
           </button>
         </div>
       </div>
-      {showImporterGuide && <ImporterGuide onClose={() => setShowImporterGuide(false)} />}
       {showImportedTable && importedSnapshot && (
         <ImportedTableViewer
           snapshot={importedSnapshot}

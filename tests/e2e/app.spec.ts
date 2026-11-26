@@ -80,7 +80,6 @@ test('keeps import tools hidden until the private shortcut is used', async ({ pa
 
   await expect(page.getByLabel('Matchup data source')).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Import CSV' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Get importer' })).toHaveCount(0)
   await expect(page.getByLabel('Your deck 1 class')).toBeVisible()
 
   await page.keyboard.press('Alt+Shift+D')
@@ -157,15 +156,6 @@ test('automatically restores the current match name and data source after a relo
 test('imports and keeps multiple matchup datasets', async ({ page }) => {
   await page.goto('./')
   await enableImportTools(page)
-
-  await page.getByRole('button', { name: 'Get importer' }).click()
-  const guide = page.getByRole('dialog', { name: 'Import current matchup data' })
-  await expect(guide).toBeVisible()
-  await expect(guide.getByRole('link', { name: 'Download ZIP' })).toHaveAttribute(
-    'href',
-    /downloads\/pickwise-matchup-exporter\.zip$/,
-  )
-  await page.getByRole('button', { name: 'Close importer guide' }).click()
 
   const fileInput = page.getByLabel('Choose matchup CSV')
   await fileInput.setInputFiles({

@@ -409,10 +409,6 @@ select:hover {
   gap: 12px;
 }
 
-.importer-help-button {
-  white-space: nowrap;
-}
-
 .data-source-status {
   grid-column: 1 / -1;
   display: flex;
@@ -973,106 +969,6 @@ footer a:hover {
 
 .modal-open {
   overflow: hidden;
-}
-
-.guide-backdrop {
-  position: fixed;
-  z-index: 60;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: rgba(24, 34, 52, 0.36);
-}
-
-.guide-dialog {
-  width: min(820px, 100%);
-  max-height: min(760px, calc(100vh - 40px));
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  background: #ffffff;
-  box-shadow: 0 28px 90px rgba(45, 55, 72, 0.28);
-}
-
-.guide-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 22px 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.guide-header h2 {
-  margin: 0;
-  font-size: 1.45rem;
-}
-
-.guide-content {
-  max-height: calc(100vh - 150px);
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.guide-download {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 17px;
-  border: 1px solid #e2b45f;
-  background: #fff7e5;
-}
-
-.guide-download > div {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.guide-download span,
-.guide-note {
-  color: var(--muted);
-  font-size: 0.74rem;
-  line-height: 1.5;
-}
-
-.guide-download-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 150px;
-  text-decoration: none;
-}
-
-.guide-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  margin-top: 18px;
-  border: 1px solid var(--line);
-  background: var(--line);
-}
-
-.guide-columns section {
-  padding: 18px;
-  background: var(--surface);
-}
-
-.guide-columns ol {
-  margin: 0;
-  padding-left: 22px;
-  color: #344054;
-  font-size: 0.78rem;
-  line-height: 1.65;
-}
-
-.guide-columns li + li {
-  margin-top: 7px;
-}
-
-.guide-note {
-  margin: 16px 0 0;
 }
 
 .imported-table-backdrop {
@@ -1963,10 +1859,6 @@ code {
     width: 100vw;
   }
 
-  .guide-backdrop {
-    padding: 0;
-  }
-
   .imported-table-backdrop {
     padding: 0;
   }
@@ -2004,30 +1896,6 @@ code {
   .imported-matchup-table .imported-table-corner {
     width: 150px;
     min-width: 150px;
-  }
-
-  .guide-dialog {
-    width: 100vw;
-    max-height: 100vh;
-  }
-
-  .guide-header,
-  .guide-content {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .guide-content {
-    max-height: calc(100vh - 84px);
-  }
-
-  .guide-download {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .guide-columns {
-    grid-template-columns: 1fr;
   }
 
   .math-header,

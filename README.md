@@ -23,10 +23,10 @@ and imported matchup datasets stay in the browser's local storage.
 ## Matchup importer
 
 The unpacked Manifest V3 extension source is in `extension/`. The downloadable
-archive served by the site is
-`public/downloads/pickwise-matchup-exporter.zip`. It reads only the active tab
-after an explicit click and downloads a local CSV; it does not send data to a
-server. The in-app **Get importer** guide contains installation and usage steps.
+archive kept for private installation is
+`extension/pickwise-matchup-exporter.zip`. It reads only the active tab after
+an explicit click and downloads a local CSV; it does not send data to a server.
+The public application does not link to or document the extension.
 
 Each CSV capture is stored separately, so a match can select a particular
 HSGuru or HSReplay dataset while other imported variants remain available.
